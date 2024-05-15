@@ -188,171 +188,176 @@
 
     <!-- Script JavaScript pour traiter les formulaires et stocker les données -->
     <script>
-        // JavaScript code here
-    </script>
-    <!-- Script JavaScript pour traiter les formulaires et stocker les données -->
-    <script>
-        // Tableau pour stocker toutes les informations
-        var allData1 = [];
-        
-        // Tableau pour stocker les informations sur les rues et leurs adresses
-        var streetsData1 = [];
-        
-        // Gestionnaire d'événements pour le bouton "Ajouter Rue"
-        document.getElementById("addStreetButton1").addEventListener("click", function(event) {
-            event.preventDefault(); // Empêche le formulaire de se soumettre normalement
-            
-            // Récupérer le nom de la nouvelle rue
-            var newStreetName = document.getElementById("newStreetName1").value;
-            
-            // Créer une nouvelle entrée pour la nouvelle rue dans streetsData
-            streetsData1.push({
-                streetName: newStreetName,
-                addresses: []
+        document.addEventListener('DOMContentLoaded', () => {
+            const allDataKey = 'allData1';
+            const streetsDataKey = 'streetsData1';
+
+            // Charger les données du Local Storage au chargement de la page
+            var allData1 = JSON.parse(localStorage.getItem(allDataKey)) || [];
+            var streetsData1 = JSON.parse(localStorage.getItem(streetsDataKey)) || [];
+
+            // Fonction pour sauvegarder les données dans le Local Storage
+            function saveData() {
+                localStorage.setItem(allDataKey, JSON.stringify(allData1));
+                localStorage.setItem(streetsDataKey, JSON.stringify(streetsData1));
+            }
+
+            // Initialiser les rues et adresses existantes
+            streetsData1.forEach(street => {
+                var option = document.createElement("option");
+                option.text = street.streetName;
+                document.getElementById("streetFilter1").add(option);
             });
 
-            // Mettre à jour le menu déroulant pour inclure la nouvelle rue
-            var streetFilter = document.getElementById("streetFilter1");
-            var option = document.createElement("option");
-            option.text = newStreetName;
-            streetFilter.add(option);
+            // Gestionnaire d'événements pour le bouton "Ajouter Rue"
+            document.getElementById("addStreetButton1").addEventListener("click", function(event) {
+                event.preventDefault(); // Empêche le formulaire de se soumettre normalement
 
-            // Afficher le formulaire d'adresse
-            document.getElementById("addressForm1").style.display = "block";
-            document.getElementById("streetName1").value = newStreetName;
+                // Récupérer le nom de la nouvelle rue
+                var newStreetName = document.getElementById("newStreetName1").value;
 
-            // Afficher les données de débogage
-            console.log("Streets Data après ajout d'une nouvelle rue :", streetsData1);
-        });
+                // Ajouter la nouvelle rue à streetsData1
+                streetsData1.push({
+                    streetName: newStreetName,
+                    addresses: []
+                });
 
-        // Gestionnaire d'événements pour le bouton "Ajouter Adresse"
-        document.getElementById("addAddressButton1").addEventListener("click", function() {
-            // Récupérer les valeurs des champs du formulaire
-            var streetName = document.getElementById("streetName1").value;
-            var number = document.getElementById("number1").value;
-            var status = document.getElementById("status1").value;
-            var additionalInfo = document.getElementById("additionalInfo1").value;
-            
-            // Ajouter les informations de l'adresse à streetsData
-            streetsData1.forEach(function(street) {
-                if (street.streetName === streetName) {
-                    street.addresses.push({
-                        number: number,
-                        status: status,
-                        additionalInfo: additionalInfo
-                    });
-                }
+                // Mettre à jour le menu déroulant pour inclure la nouvelle rue
+                var streetFilter = document.getElementById("streetFilter1");
+                var option = document.createElement("option");
+                option.text = newStreetName;
+                streetFilter.add(option);
+
+                // Afficher le formulaire d'adresse
+                document.getElementById("addressForm1").style.display = "block";
+                document.getElementById("streetName1").value = newStreetName;
+
+                // Sauvegarder les données
+                saveData();
+
+                // Réinitialiser le champ d'entrée de rue
+                document.getElementById("newStreetName1").value = '';
             });
-            
-            // Réinitialiser le formulaire après soumission
-            document.getElementById("addressForm1").reset();
 
-            // Afficher les données de débogage
-            console.log("Streets Data après ajout d'une nouvelle adresse :", streetsData1);
-        });
+            // Gestionnaire d'événements pour le bouton "Ajouter Adresse"
+            document.getElementById("addAddressButton1").addEventListener("click", function() {
+                // Récupérer les valeurs des champs du formulaire
+                var streetName = document.getElementById("streetName1").value;
+                var number = document.getElementById("number1").value;
+                var status = document.getElementById("status1").value;
+                var additionalInfo = document.getElementById("additionalInfo1").value;
 
-        // Gestionnaire d'événements pour le bouton "Afficher Tableau"
-        document.getElementById("displayTableButton1").addEventListener("click", function() {
-            console.log("Bouton Afficher Tableau cliqué");
-            console.log("Données des Rues :", streetsData1);
-            console.log("Toutes les Données :", allData1);
-            // Regrouper toutes les informations dans un tableau global
-            allData1 = [];
-            streetsData1.forEach(function(street) {
-                street.addresses.forEach(function(address) {
-                    allData1.push({
-                        streetName: street.streetName,
-                        number: address.number,
-                        status: address.status,
-                        additionalInfo: address.additionalInfo
+                // Ajouter les informations de l'adresse à streetsData1
+                streetsData1.forEach(function(street) {
+                    if (street.streetName === streetName) {
+                        street.addresses.push({
+                            number: number,
+                            status: status,
+                            additionalInfo: additionalInfo
+                        });
+                    }
+                });
+
+                // Sauvegarder les données
+                saveData();
+
+                // Réinitialiser le formulaire après soumission
+                document.getElementById("addressForm1").reset();
+            });
+
+            // Gestionnaire d'événements pour le bouton "Afficher Tableau"
+            document.getElementById("displayTableButton1").addEventListener("click", function() {
+                // Regrouper toutes les informations dans un tableau global
+                allData1 = [];
+                streetsData1.forEach(function(street) {
+                    street.addresses.forEach(function(address) {
+                        allData1.push({
+                            streetName: street.streetName,
+                            number: address.number,
+                            status: address.status,
+                            additionalInfo: address.additionalInfo
+                        });
                     });
                 });
-            });
-            console.log("Toutes les Données après mise à jour :", allData1);
 
-            // Afficher le tableau
-            displayDataTable();
-        });
+                // Sauvegarder les données
+                saveData();
 
-        // Fonction pour afficher le tableau
-        function displayDataTable() {
-            console.log("Affichage du Tableau");
-            var tbody = document.getElementById("dataBody1");
-            tbody.innerHTML = ""; // Réinitialiser le corps du tableau
-
-            var filteredData = applyFilters(allData1);
-
-            // Ajouter chaque élément au tableau
-            filteredData.forEach(function(data) {
-                var row = document.createElement("tr");
-                var streetNameCell = document.createElement("td");
-                var numberCell = document.createElement("td");
-                var statusCell = document.createElement("td");
-                var additionalInfoCell = document.createElement("td");
-
-                streetNameCell.textContent = data.streetName;
-                numberCell.textContent = data.number;
-                statusCell.textContent = data.status;
-                additionalInfoCell.textContent = data.additionalInfo;
-
-                row.appendChild(streetNameCell);
-                row.appendChild(numberCell);
-                row.appendChild(statusCell);
-                row.appendChild(additionalInfoCell);
-
-                // Ajout de la classe de couleur selon le statut
-                row.classList.add('status-' + data.status.replace(/\s+/g, '-'));
-
-                tbody.appendChild(row);
+                // Afficher le tableau
+                displayDataTable();
             });
 
-            // Afficher le tableau
-            document.getElementById("dataTable1").style.display = "block";
-        }
+            // Fonction pour afficher le tableau
+            function displayDataTable() {
+                var tbody = document.getElementById("dataBody1");
+                tbody.innerHTML = ""; // Réinitialiser le corps du tableau
 
-        // Fonction pour appliquer les filtres
-        function applyFilters(data) {
-            console.log("Application des Filtres");
-            var streetFilter = document.getElementById("streetFilter1").value.trim().toLowerCase();
-            var statusFilter = document.getElementById("statusFilter1").value;
+                var filteredData = applyFilters(allData1);
 
-            console.log("Filtre par Rue :", streetFilter);
-            console.log("Filtre par Statut :", statusFilter);
+                // Ajouter chaque élément au tableau
+                filteredData.forEach(function(data) {
+                    var row = document.createElement("tr");
+                    var streetNameCell = document.createElement("td");
+                    var numberCell = document.createElement("td");
+                    var statusCell = document.createElement("td");
+                    var additionalInfoCell = document.createElement("td");
 
-            var filteredData = data.filter(function(data) {
-                var streetMatch = (streetFilter === "" || data.streetName.toLowerCase().includes(streetFilter));
-                var statusMatch = (statusFilter === "" || data.status === statusFilter);
+                    streetNameCell.textContent = data.streetName;
+                    numberCell.textContent = data.number;
+                    statusCell.textContent = data.status;
+                    additionalInfoCell.textContent = data.additionalInfo;
 
-                console.log("Correspondance de Rue :", streetMatch);
-                console.log("Correspondance de Statut :", statusMatch);
+                    row.appendChild(streetNameCell);
+                    row.appendChild(numberCell);
+                    row.appendChild(statusCell);
+                    row.appendChild(additionalInfoCell);
 
-                return streetMatch && statusMatch;
-            });
+                    // Ajout de la classe de couleur selon le statut
+                    row.classList.add('status-' + data.status.replace(/\s+/g, '-'));
 
-            console.log("Données Filtrées :", filteredData);
-            return filteredData;
-        }
+                    tbody.appendChild(row);
+                });
 
-        // Fonction pour renommer un onglet
-        function renameTab(tabLinkId) {
-            var newName = prompt("Entrez le nouveau nom pour l'onglet :", "Nouveau Nom");
-            if (newName != null && newName != "") {
-                document.getElementById(tabLinkId).textContent = newName;
+                // Afficher le tableau
+                document.getElementById("dataTable1").style.display = "block";
             }
-        }
 
-        // Fonction pour supprimer un onglet
-        function deleteTab(tabId) {
-            var List = document.getElementById("myTabs");
-            var tabButton = document.getElementById(tabId);
-            tabButton.parentNode.removeChild(tabButton);
+            // Fonction pour appliquer les filtres
+            function applyFilters(data) {
+                var streetFilter = document.getElementById("streetFilter1").value.trim().toLowerCase();
+                var statusFilter = document.getElementById("statusFilter1").value;
 
-            // Réinitialiser les données associées à cet onglet
-            allData1 = [];
-            streetsData1 = [];
-        }
+                var filteredData = data.filter(function(data) {
+                    var streetMatch = (streetFilter === "" || data.streetName.toLowerCase().includes(streetFilter));
+                    var statusMatch = (statusFilter === "" || data.status === statusFilter);
+
+                    return streetMatch && statusMatch;
+                });
+
+                return filteredData;
+            }
+
+            // Fonction pour renommer un onglet
+            window.renameTab = function(tabLinkId) {
+                var newName = prompt("Entrez le nouveau nom pour l'onglet :", "Nouveau Nom");
+                if (newName != null && newName != "") {
+                    document.getElementById(tabLinkId).textContent = newName;
+                }
+            }
+
+            // Fonction pour supprimer un onglet
+            window.deleteTab = function(tabId) {
+                var List = document.getElementById("myTabs");
+                var tabButton = document.getElementById(tabId);
+                tabButton.parentNode.removeChild(tabButton);
+
+                // Réinitialiser les données associées à cet onglet
+                allData1 = [];
+                streetsData1 = [];
+                saveData();
+            }
+        });
     </script>
-
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
