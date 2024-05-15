@@ -167,8 +167,10 @@
                     <button type="button" id="applyFiltersButton1" class="btn btn-primary">Appliquer Filtres</button>
                 </form>
 
-                <!-- Bouton pour afficher les informations sous forme de tableau -->
+                <!-- Boutons pour afficher et exporter les informations sous forme de tableau -->
                 <button id="displayTableButton1" class="btn btn-primary">Afficher Tableau</button>
+                <button id="exportButton1" class="btn btn-success">Exporter en Excel</button>
+                <input type="file" id="importFile1" class="form-control" accept=".xlsx, .xls" />
 
                 <!-- Tableau pour afficher toutes les informations sous forme de tableau -->
                 <table id="dataTable1" style="display: none;" class="table">
@@ -188,6 +190,7 @@
     </div>
 
     <!-- Script JavaScript pour traiter les formulaires et stocker les données -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         // Clés pour le Local Storage
         const allDataKey = 'allData1';
@@ -377,6 +380,72 @@
         // Gestionnaire d'événements pour le bouton "Appliquer Filtres"
         document.getElementById("applyFiltersButton1").addEventListener("click", function() {
             displayDataTable();
+        });
+
+        // Fonction pour exporter les données vers un fichier Excel
+        document.getElementById("exportButton1").addEventListener("click", function() {
+            var wb = XLSX.utils.book_new();
+            var ws = XLSX.utils.json_to_sheet(allData1);
+            XLSX.utils.book_append_sheet(wb, ws, "Data");
+            XLSX.writeFile(wb, "data.xlsx");
+        });
+
+        // Fonction pour importer les données depuis un fichier Excel
+        document.getElementById("importFile1").addEventListener("change", function(event) {
+            var file = event.target.files[0];
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var data = new Uint8Array(e.target.result);
+                var workbook = XLSX.read(data, { type: 'array' });
+                var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                var importedData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                // Réinitialiser les tableaux de données
+                allData1 = [];
+                streetsData1 = [];
+
+                // Remplir les tableaux de données avec les données importées
+                for (var i = 1; i < importedData.length; i++) {
+                    var row = importedData[i];
+                    var streetName = row[0];
+                    var number = row[1];
+                    var status = row[2];
+                    var additionalInfo = row[3];
+
+                    // Ajouter les informations de l'adresse à streetsData
+                    var street = streetsData1.find(s => s.streetName === streetName);
+                    if (!street) {
+                        street = { streetName: streetName, addresses: [] };
+                        streetsData1.push(street);
+
+                        // Mettre à jour le menu déroulant pour inclure la nouvelle rue
+                        var streetFilter = document.getElementById("streetFilter1");
+                        var option = document.createElement("option");
+                        option.text = streetName;
+                        streetFilter.add(option);
+                    }
+                    street.addresses.push({
+                        number: number,
+                        status: status,
+                        additionalInfo: additionalInfo
+                    });
+
+                    // Ajouter aux données globales
+                    allData1.push({
+                        streetName: streetName,
+                        number: number,
+                        status: status,
+                        additionalInfo: additionalInfo
+                    });
+                }
+
+                // Sauvegarder les données
+                saveData();
+
+                // Afficher le tableau mis à jour
+                displayDataTable();
+            };
+            reader.readAsArrayBuffer(file);
         });
     </script>
 
