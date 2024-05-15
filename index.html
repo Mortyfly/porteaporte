@@ -210,6 +210,9 @@
                 option.text = street.streetName;
                 streetFilter.add(option);
             });
+
+            // Afficher les données dans le tableau
+            displayDataTable();
         });
 
         // Fonction pour sauvegarder les données dans le Local Storage
@@ -225,12 +228,9 @@
             // Récupérer le nom de la nouvelle rue
             var newStreetName = document.getElementById("newStreetName1").value;
             
-            // Créer une nouvelle entrée pour la nouvelle rue dans streetsData
-            streetsData1.push({
-                streetName: newStreetName,
-                addresses: []
-            });
-
+            // Créer un nouvel objet pour la rue et l'ajouter au tableau
+            streetsData1.push({ streetName: newStreetName, addresses: [] });
+            
             // Mettre à jour le menu déroulant pour inclure la nouvelle rue
             var streetFilter = document.getElementById("streetFilter1");
             var option = document.createElement("option");
