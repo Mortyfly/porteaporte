@@ -178,6 +178,7 @@
                             <th>Numéro</th>
                             <th>Statut</th>
                             <th>Informations Additionnelles</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="dataBody1"></tbody>
@@ -267,11 +268,27 @@
                 }
             });
 
+            // Regrouper toutes les informations dans un tableau global
+            allData1 = [];
+            streetsData1.forEach(function(street) {
+                street.addresses.forEach(function(address) {
+                    allData1.push({
+                        streetName: street.streetName,
+                        number: address.number,
+                        status: address.status,
+                        additionalInfo: address.additionalInfo
+                    });
+                });
+            });
+
             // Sauvegarder les données
             saveData();
 
             // Réinitialiser le formulaire après soumission
             document.getElementById("addressForm1").reset();
+
+            // Afficher le tableau mis à jour
+            displayDataTable();
         });
 
         // Fonction pour afficher les données sous forme de tableau
@@ -292,7 +309,7 @@
             });
 
             // Ajouter les lignes au tableau
-            filteredData.forEach(function(data) {
+            filteredData.forEach(function(data, index) {
                 var row = dataBody.insertRow();
                 row.insertCell(0).innerText = data.streetName;
                 row.insertCell(1).innerText = data.number;
@@ -301,10 +318,38 @@
 
                 // Ajouter la classe de couleur en fonction du statut
                 row.classList.add('status-' + data.status.replace(/\s+/g, '-'));
+
+                // Ajouter le bouton de suppression
+                var deleteCell = row.insertCell(4);
+                var deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Supprimer';
+                deleteButton.classList.add('btn', 'btn-danger');
+                deleteButton.addEventListener('click', function() {
+                    deleteAddress(index);
+                });
+                deleteCell.appendChild(deleteButton);
             });
 
             // Afficher le tableau
             dataTable.style.display = 'table';
+        }
+
+        // Fonction pour supprimer une adresse
+        function deleteAddress(index) {
+            allData1.splice(index, 1);
+
+            // Mettre à jour streetsData1 en supprimant l'adresse correspondante
+            streetsData1.forEach(function(street) {
+                street.addresses = street.addresses.filter(function(address) {
+                    return !(address.number === allData1[index].number && street.streetName === allData1[index].streetName);
+                });
+            });
+
+            // Sauvegarder les données
+            saveData();
+
+            // Afficher le tableau mis à jour
+            displayDataTable();
         }
 
         // Gestionnaire d'événements pour le bouton "Afficher Tableau"
