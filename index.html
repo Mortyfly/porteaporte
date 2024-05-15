@@ -170,7 +170,8 @@
                 <!-- Boutons pour afficher et exporter les informations sous forme de tableau -->
                 <button id="displayTableButton1" class="btn btn-primary">Afficher Tableau</button>
                 <button id="exportButton1" class="btn btn-success">Exporter en Excel</button>
-                <input type="file" id="importFile1" class="form-control" accept=".xlsx, .xls" />
+                <button id="importButton1" class="btn btn-info">Importer</button>
+                <input type="file" id="importFile1" class="form-control" accept=".xlsx, .xls" style="display: none;" />
 
                 <!-- Tableau pour afficher toutes les informations sous forme de tableau -->
                 <table id="dataTable1" style="display: none;" class="table">
@@ -391,6 +392,10 @@
         });
 
         // Fonction pour importer les données depuis un fichier Excel
+        document.getElementById("importButton1").addEventListener("click", function() {
+            document.getElementById("importFile1").click();
+        });
+
         document.getElementById("importFile1").addEventListener("change", function(event) {
             var file = event.target.files[0];
             var reader = new FileReader();
