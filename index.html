@@ -122,7 +122,7 @@
                     <button id="addStreetButton1" type="button" class="btn btn-primary">Ajouter Rue</button>
                 </form>
                 
-                <!-- Formulaire pour ajouter un numéro à une rue existante -->
+                <!-- Formulaire pour ajouter ou modifier un numéro à une rue existante -->
                 <form id="addressForm1" style="display: none;">
                     <input type="hidden" id="streetName1" name="streetName1">
                     <label for="number1">Numéro :</label>
@@ -159,7 +159,7 @@
                         <option value="Accepté">Accepté</option>
                         <option value="Absent">Absent</option>
                         <option value="PI">PI</option>
-                        <option value="Fermé">Fermé</option>
+                        <option value="Fermé">Fermé</option
                         <option value="À Vendre">À Vendre</option>
                         <option value="Réf. Potentiel">Réf. Potentiel</option>
                     </select><br><br>
@@ -332,15 +332,19 @@
                 // Ajouter la classe de couleur en fonction du statut
                 row.classList.add('status-' + data.status.replace(/\s+/g, '-'));
 
-                // Ajouter le bouton de suppression
-                var deleteCell = row.insertCell(4);
+                // Ajouter les boutons d'action
+                var actionCell = row.insertCell(4);
+                var modifyButton = document.createElement('button');
+                modifyButton.innerText = 'Modifier';
+                modifyButton.classList.add('btn', 'btn-primary');
+                modifyButton.onclick = function() { modifyAddress(index); };
+                actionCell.appendChild(modifyButton);
+
                 var deleteButton = document.createElement('button');
                 deleteButton.innerText = 'Supprimer';
                 deleteButton.classList.add('btn', 'btn-danger');
-                deleteButton.addEventListener('click', function() {
-                    deleteAddress(index);
-                });
-                deleteCell.appendChild(deleteButton);
+                deleteButton.onclick = function() { deleteAddress(index); };
+                actionCell.appendChild(deleteButton);
             });
 
             // Afficher le tableau
@@ -360,6 +364,74 @@
 
             // Sauvegarder les données
             saveData();
+
+            // Afficher le tableau mis à jour
+            displayDataTable();
+        }
+
+        // Fonction pour modifier une adresse
+        function modifyAddress(index) {
+            var data = allData1[index];
+
+            // Pré-remplir le formulaire avec les informations à modifier
+            document.getElementById("streetName1").value = data.streetName;
+            document.getElementById("number1").value = data.number;
+            document.getElementById("status1").value = data.status;
+            document.getElementById("additionalInfo1").value = data.additionalInfo;
+
+            // Afficher le bouton de mise à jour et de cancel
+            document.getElementById("addAddressButton1").style.display = "none";
+            document.getElementById("updateAddressButton1").style.display = "inline";
+            document.getElementById("cancelUpdateButton1").style.display = "inline";
+
+            document.getElementById("updateAddressButton1").onclick = function() {
+                updateAddress(data, index);
+            };
+
+            document.getElementById("cancelUpdateButton1").onclick = function() {
+                document.getElementById("addressForm1").reset();
+                document.getElementById("updateAddressButton1").style.display = "none";
+                document.getElementById("cancelUpdateButton1").style.display = "none";
+                document.getElementById("addAddressButton1").style.display = "inline";
+            };
+        }
+
+        // Fonction pour mettre à jour une adresse
+        function updateAddress(data, index) {
+            // Récupérer les valeurs mises à jour
+            var updatedStreetName = document.getElementById("streetName1").value;
+            var updatedNumber = document.getElementById("number1").value;
+            var updatedStatus = document.getElementById("status1").value;
+            var updatedAdditionalInfo = document.getElementById("additionalInfo1").value;
+
+            // Mettre à jour l'objet avec les nouvelles valeurs
+            data.streetName = updatedStreetName;
+            data.number = updatedNumber;
+            data.status = updatedStatus;
+            data.additionalInfo = updatedAdditionalInfo;
+
+            // Mettre à jour les tableaux de données
+            allData1[index] = data;
+            streetsData1.forEach(function(street) {
+                if (street.streetName === data.streetName) {
+                    street.addresses.forEach(function(address, addrIndex) {
+                        if (addrIndex === index) {
+                            address.number = updatedNumber;
+                            address.status = updatedStatus;
+                            address.additionalInfo = updatedAdditionalInfo;
+                        }
+                    });
+                }
+            });
+
+            // Sauvegarder les données
+            saveData();
+
+            // Réinitialiser le formulaire et masquer les boutons de mise à jour
+            document.getElementById("addressForm1").reset();
+            document.getElementById("updateAddressButton1").style.display = "none";
+            document.getElementById("cancelUpdateButton1").style.display = "none";
+            document.getElementById("addAddressButton1").style.display = "inline";
 
             // Afficher le tableau mis à jour
             displayDataTable();
