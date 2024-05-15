@@ -226,6 +226,15 @@
             localStorage.setItem(streetsDataKey, JSON.stringify(streetsData1));
         }
 
+        // Fonction pour renommer un onglet
+        function renameTab(tabLinkId) {
+            var newTabName = prompt("Entrez le nouveau nom de l'onglet:");
+            if (newTabName) {
+                var tabLink = document.getElementById(tabLinkId);
+                tabLink.textContent = newTabName;
+            }
+        }
+
         // Gestionnaire d'événements pour le bouton "Ajouter Rue"
         document.getElementById("addStreetButton1").addEventListener("click", function(event) {
             event.preventDefault(); // Empêche le formulaire de se soumettre normalement
@@ -385,10 +394,12 @@
 
         // Fonction pour exporter les données vers un fichier Excel
         document.getElementById("exportButton1").addEventListener("click", function() {
+            var tabLink = document.querySelector('.nav-link.active');
+            var tabName = tabLink ? tabLink.textContent : 'data';
             var wb = XLSX.utils.book_new();
             var ws = XLSX.utils.json_to_sheet(allData1);
             XLSX.utils.book_append_sheet(wb, ws, "Data");
-            XLSX.writeFile(wb, "data.xlsx");
+            XLSX.writeFile(wb, `${tabName}.xlsx`);
         });
 
         // Fonction pour importer les données depuis un fichier Excel
