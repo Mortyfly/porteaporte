@@ -159,7 +159,7 @@
                         <option value="Accepté">Accepté</option>
                         <option value="Absent">Absent</option>
                         <option value="PI">PI</option>
-                        <option value="Fermé">Fermé</option
+                        <option value="Fermé">Fermé</option>
                         <option value="À Vendre">À Vendre</option>
                         <option value="Réf. Potentiel">Réf. Potentiel</option>
                     </select><br><br>
@@ -270,16 +270,33 @@
             var status = document.getElementById("status1").value;
             var additionalInfo = document.getElementById("additionalInfo1").value;
 
-            // Ajouter les informations de l'adresse à streetsData
+            // Vérifier si l'adresse existe déjà
+            var exists = false;
             streetsData1.forEach(function(street) {
                 if (street.streetName === streetName) {
-                    street.addresses.push({
-                        number: number,
-                        status: status,
-                        additionalInfo: additionalInfo
+                    street.addresses.forEach(function(address) {
+                        if (address.number === number) {
+                            // Adresse existante, la mettre à jour
+                            address.status = status;
+                            address.additionalInfo = additionalInfo;
+                            exists = true;
+                        }
                     });
                 }
             });
+
+            if (!exists) {
+                // Ajouter les informations de l'adresse si elle n'existe pas
+                streetsData1.forEach(function(street) {
+                    if (street.streetName === streetName) {
+                        street.addresses.push({
+                            number: number,
+                            status: status,
+                            additionalInfo: additionalInfo
+                        });
+                    }
+                });
+            }
 
             // Regrouper toutes les informations dans un tableau global
             allData1 = [];
@@ -322,7 +339,7 @@
             });
 
             // Ajouter les lignes au tableau
-            filteredData.forEach(function(data, index) {
+            filteredData.forEach(function(data) {
                 var row = dataBody.insertRow();
                 row.insertCell(0).innerText = data.streetName;
                 row.insertCell(1).innerText = data.number;
