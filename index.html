@@ -215,8 +215,8 @@
     <script>
         const allDataKey = 'allData1';
         const streetsDataKey = 'streetsData1';
-        var allData1 = [];
-        var streetsData1 = [];
+        let allData1 = [];
+        let streetsData1 = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
@@ -224,98 +224,94 @@
                 displayDataTable();  // Afficher automatiquement le tableau si des données existent
             }
 
-            document.getElementById("addStreetButton1").addEventListener("click", function() {
-                const streetSelect = document.getElementById("streetSelection1");
-                const newStreetName = document.getElementById("newStreetName1").value.trim();
-                if (newStreetName && !streetsData1.some(street => street.streetName === newStreetName)) {
-                    streetsData1.push({ streetName: newStreetName, addresses: [] });
-                    const option = new Option(newStreetName, newStreetName);
-                    streetSelect.appendChild(option);
-                    streetSelect.value = newStreetName;
-                    document.getElementById("newStreetName1").value = '';
-                } else if (!newStreetName) {
-                    alert("Le nom de la rue ne peut pas être vide.");
-                    return;
-                }
-                document.getElementById("streetName1").value = streetSelect.value;
-                document.getElementById("addressForm1").style.display = 'block';
-                saveData();
-            });
-
-            document.getElementById("addAddressButton1").addEventListener("click", function() {
-                var streetName = document.getElementById("streetName1").value;
-                var number = document.getElementById("number1").value.trim();
-                var status = document.getElementById("status1").value;
-                var additionalInfo = document.getElementById("additionalInfo1").value.trim();
-
-                if (!number) {
-                    alert("Le numéro ne peut pas être vide.");
-                    return;
-                }
-
-                var street = streetsData1.find(s => s.streetName === streetName);
-                if (street) {
-                    var addressExists = street.addresses.some(addr => addr.number === number);
-                    if (!addressExists) {
-                        street.addresses.push({ number: number, status: status, additionalInfo: additionalInfo });
-                        allData1.push({ streetName: streetName, number: number, status: status, additionalInfo: additionalInfo });
-                        saveData();
-                        displayDataTable();
-                    } else {
-                        alert("Cette adresse existe déjà pour cette rue.");
-                    }
-                }
-            });
-
-            document.getElementById("exportButton1").addEventListener("click", function() {
-                var wb = XLSX.utils.book_new();
-                var ws = XLSX.utils.json_to_sheet(allData1);
-                XLSX.utils.book_append_sheet(wb, ws, "Data");
-                XLSX.writeFile(wb, "Suivi_Porte_a_Porte.xlsx");
-            });
-
-            document.getElementById("importButton1").addEventListener("click", function() {
-                document.getElementById("importFile1").click();
-            });
-
-            document.getElementById("importFile1").addEventListener("change", function(event) {
-                var file = event.target.files[0];
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var data = new Uint8Array(e.target.result);
-                    var workbook = XLSX.read(data, { type: 'array' });
-                    var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    var importedData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-                    allData1 = [];
-                    streetsData1 = [];
-                    importedData.forEach(row => {
-                        var streetName = row[0];
-                        var number = row[1];
-                        var status = row[2];
-                        var additionalInfo = row[3];
-                        var street = streetsData1.find(s => s.streetName === streetName);
-                        if (!street) {
-                            street = { streetName: streetName, addresses: [] };
-                            streetsData1.push(street);
-                        }
-                        street.addresses.push({ number: number, status: status, additionalInfo: additionalInfo });
-                        allData1.push({ streetName: streetName, number: number, status: status, additionalInfo: additionalInfo });
-                    });
-                    saveData();
-                    updateStreetSelections();
-                    displayDataTable();
-                };
-                reader.readAsArrayBuffer(file);
-            });
-
-            document.getElementById("applyFiltersButton1").addEventListener("click", function() {
-                displayDataTable();
-            });
-
-            document.getElementById("displayTableButton1").addEventListener("click", function() {
-                displayDataTable();
-            });
+            document.getElementById("addStreetButton1").addEventListener("click", addStreet);
+            document.getElementById("addAddressButton1").addEventListener("click", addAddress);
+            document.getElementById("exportButton1").addEventListener("click", exportData);
+            document.getElementById("importButton1").addEventListener("click", () => document.getElementById("importFile1").click());
+            document.getElementById("importFile1").addEventListener("change", importData);
+            document.getElementById("applyFiltersButton1").addEventListener("click", displayDataTable);
+            document.getElementById("displayTableButton1").addEventListener("click", displayDataTable);
         });
+
+        function addStreet() {
+            const streetSelect = document.getElementById("streetSelection1");
+            const newStreetName = document.getElementById("newStreetName1").value.trim();
+            if (newStreetName && !streetsData1.some(street => street.streetName === newStreetName)) {
+                streetsData1.push({ streetName: newStreetName, addresses: [] });
+                const option = new Option(newStreetName, newStreetName);
+                streetSelect.appendChild(option);
+                streetSelect.value = newStreetName;
+                document.getElementById("newStreetName1").value = '';
+            } else if (!newStreetName) {
+                alert("Le nom de la rue ne peut pas être vide.");
+                return;
+            }
+            document.getElementById("streetName1").value = streetSelect.value;
+            document.getElementById("addressForm1").style.display = 'block';
+            saveData();
+        }
+
+        function addAddress() {
+            const streetName = document.getElementById("streetName1").value;
+            const number = document.getElementById("number1").value.trim();
+            const status = document.getElementById("status1").value;
+            const additionalInfo = document.getElementById("additionalInfo1").value.trim();
+
+            if (!number) {
+                alert("Le numéro ne peut pas être vide.");
+                return;
+            }
+
+            const street = streetsData1.find(s => s.streetName === streetName);
+            if (street) {
+                const addressExists = street.addresses.some(addr => addr.number === number);
+                if (!addressExists) {
+                    street.addresses.push({ number, status, additionalInfo });
+                    allData1.push({ streetName, number, status, additionalInfo });
+                    saveData();
+                    displayDataTable();
+                } else {
+                    alert("Cette adresse existe déjà pour cette rue.");
+                }
+            }
+        }
+
+        function exportData() {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(allData1);
+            XLSX.utils.book_append_sheet(wb, ws, "Data");
+            XLSX.writeFile(wb, "Suivi_Porte_a_Porte.xlsx");
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const importedData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                allData1 = [];
+                streetsData1 = [];
+                importedData.forEach(row => {
+                    const streetName = row[0];
+                    const number = row[1];
+                    const status = row[2];
+                    const additionalInfo = row[3];
+                    let street = streetsData1.find(s => s.streetName === streetName);
+                    if (!street) {
+                        street = { streetName, addresses: [] };
+                        streetsData1.push(street);
+                    }
+                    street.addresses.push({ number, status, additionalInfo });
+                    allData1.push({ streetName, number, status, additionalInfo });
+                });
+                saveData();
+                updateStreetSelections();
+                displayDataTable();
+            };
+            reader.readAsArrayBuffer(file);
+        }
 
         function loadData() {
             allData1 = JSON.parse(localStorage.getItem(allDataKey)) || [];
@@ -342,9 +338,9 @@
         }
 
         function renameTab(tabLinkId) {
-            var newTabName = prompt("Entrez le nouveau nom de l'onglet:");
+            const newTabName = prompt("Entrez le nouveau nom de l'onglet:");
             if (newTabName) {
-                var tabLink = document.getElementById(tabLinkId);
+                const tabLink = document.getElementById(tabLinkId);
                 tabLink.textContent = newTabName;
             }
         }
@@ -362,36 +358,32 @@
         }
 
         function displayDataTable() {
-            var streetFilter = document.getElementById("streetFilter1").value;
-            var statusFilter = document.getElementById("statusFilter1").value;
-            var filteredData = allData1.filter(function(data) {
-                return (streetFilter === "" || data.streetName === streetFilter) &&
-                       (statusFilter === "" || data.status === statusFilter);
+            const streetFilter = document.getElementById("streetFilter1").value;
+            const statusFilter = document.getElementById("statusFilter1").value;
+            const filteredData = allData1.filter(data => {
+                return (!streetFilter || data.streetName === streetFilter) &&
+                       (!statusFilter || data.status === statusFilter);
             });
 
-            var dataTable = document.getElementById("dataTable1");
-            var dataBody = document.getElementById("dataBody1");
+            const dataTable = document.getElementById("dataTable1");
+            const dataBody = document.getElementById("dataBody1");
             dataBody.innerHTML = '';
-            filteredData.forEach(function(data, index) {
-                var row = dataBody.insertRow();
+            filteredData.forEach((data, index) => {
+                const row = dataBody.insertRow();
                 row.insertCell(0).innerText = data.streetName;
                 row.insertCell(1).innerText = data.number;
                 row.insertCell(2).innerText = data.status;
                 row.insertCell(3).innerText = data.additionalInfo;
-                var actionCell = row.insertCell(4);
-                var editButton = document.createElement('button');
+                const actionCell = row.insertCell(4);
+                const editButton = document.createElement('button');
                 editButton.innerText = 'Modifier';
                 editButton.classList.add('btn', 'btn-info');
-                editButton.onclick = function() {
-                    editAddress(data, index);
-                };
+                editButton.onclick = () => editAddress(data, index);
                 actionCell.appendChild(editButton);
-                var deleteButton = document.createElement('button');
+                const deleteButton = document.createElement('button');
                 deleteButton.innerText = 'Supprimer';
                 deleteButton.classList.add('btn', 'btn-danger');
-                deleteButton.onclick = function() {
-                    deleteAddress(index);
-                };
+                deleteButton.onclick = () => deleteAddress(index);
                 actionCell.appendChild(deleteButton);
                 row.className = `status-${data.status.replace(/\.|\s/g, '-')}`;
             });
@@ -405,10 +397,10 @@
             document.getElementById("additionalInfo1").value = data.additionalInfo;
             document.getElementById("addAddressButton1").style.display = 'none';
 
-            var updateButton = document.createElement('button');
+            const updateButton = document.createElement('button');
             updateButton.innerText = 'Mettre à jour';
             updateButton.classList.add('btn', 'btn-primary');
-            updateButton.onclick = function() {
+            updateButton.onclick = () => {
                 updateAddress(data, index);
                 updateButton.remove();
                 document.getElementById("addAddressButton1").style.display = 'inline';
@@ -417,14 +409,14 @@
         }
 
         function updateAddress(data, index) {
-            var updatedStreetName = document.getElementById("streetName1").value;
-            var updatedNumber = document.getElementById("number1").value;
-            var updatedStatus = document.getElementById("status1").value;
-            var updatedAdditionalInfo = document.getElementById("additionalInfo1").value;
+            const updatedStreetName = document.getElementById("streetName1").value;
+            const updatedNumber = document.getElementById("number1").value;
+            const updatedStatus = document.getElementById("status1").value;
+            const updatedAdditionalInfo = document.getElementById("additionalInfo1").value;
 
-            var street = streetsData1.find(s => s.streetName === data.streetName);
+            const street = streetsData1.find(s => s.streetName === data.streetName);
             if (street) {
-                var addressIndex = street.addresses.findIndex(addr => addr.number === data.number);
+                const addressIndex = street.addresses.findIndex(addr => addr.number === data.number);
                 if (addressIndex > -1) {
                     street.addresses[addressIndex] = { number: updatedNumber, status: updatedStatus, additionalInfo: updatedAdditionalInfo };
                 }
@@ -436,10 +428,10 @@
         }
 
         function deleteAddress(index) {
-            var data = allData1[index];
-            var street = streetsData1.find(s => s.streetName === data.streetName);
+            const data = allData1[index];
+            const street = streetsData1.find(s => s.streetName === data.streetName);
             if (street) {
-                var addressIndex = street.addresses.findIndex(addr => addr.number === data.number);
+                const addressIndex = street.addresses.findIndex(addr => addr.number === data.number);
                 if (addressIndex > -1) {
                     street.addresses.splice(addressIndex, 1);
                 }
