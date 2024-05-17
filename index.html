@@ -97,6 +97,10 @@
             text-align: center;
             margin: 20px 0;
         }
+        .banner {
+            text-align: center;
+            margin: 20px 0;
+        }
         .nav-link {
             background-color: #000;
             color: #fff;
@@ -108,8 +112,8 @@
     </style>
 </head>
 <body>
-    <div class="logo">
-        <img src="https://cvws.icloud-content.com/B/ATeSNdpA7oMM12LIcnabh1iV91s8AVKIrFU5f-D4j0hx-bOW_AEZhDDI/oui.png?o=AqedrRPPrZC-uOwEQnhlDz01EZ9ec0v87bJdR8NPDnYT&v=1&x=3&a=CAogzkg0ttApOzM3Des-YqmYu-iRJYKj221LTMFkfCRN650SbRDIgoG3-DEYyN_cuPgxIgEAUgSV91s8WgQZhDDIaiat7ijx7dXss9Jzu9s6z-WZZ9jB1wk5tBOD8B-zCU8KJvzVC3bJA3Im2nQYK_DsKbLujhnlBW9hiEDYdrcRDL63Cd3p_cNb0JEo5pUtsMk&e=1715958394&fl=&r=08c05fab-ddb9-4082-893f-2e8253154474-1&k=QFiv7_RNXMA1Omvls9Am6Q&ckc=com.apple.clouddocs&ckz=com.apple.CloudDocs&p=139&s=Dd70QyHgQnb6rBLer6LDCPK8_n8&cd=i" alt="TERRE D'IMMO - Votre agence immobilière">
+    <div class="banner">
+        <img src="https://via.placeholder.com/1200x300.png?text=TERRE+D'IMMO+-+Votre+agence+immobilière" alt="TERRE D'IMMO - Votre agence immobilière" class="img-fluid">
     </div>
     <h1>Suivi Porte-à-Porte</h1>
     <ul class="nav nav-tabs" id="myTabs">
@@ -124,36 +128,36 @@
             <div class="container">
                 <form id="newStreetForm1">
                     <label for="streetSelection1">Sélectionner ou ajouter une nouvelle rue :</label>
-                    <select id="streetSelection1" name="streetSelection1">
+                    <select id="streetSelection1" name="streetSelection1" class="form-select">
                         <option value="">Ajouter une nouvelle rue</option>
                     </select>
-                    <input type="text" id="newStreetName1" name="newStreetName1" placeholder="Nom de la nouvelle rue">
-                    <button id="addStreetButton1" type="button" class="btn btn-primary">Ajouter/Sélectionner Rue</button>
+                    <input type="text" id="newStreetName1" name="newStreetName1" placeholder="Nom de la nouvelle rue" class="form-control">
+                    <button id="addStreetButton1" type="button" class="btn btn-primary mt-2">Ajouter/Sélectionner Rue</button>
                 </form>
                 <form id="addressForm1" style="display: none;">
                     <input type="hidden" id="streetName1" name="streetName1">
                     <label for="number1">Numéro :</label>
-                    <input type="text" id="number1" name="number1" required><br><br>
+                    <input type="text" id="number1" name="number1" required class="form-control"><br>
                     <label for="status1">Statut :</label>
-                    <select id="status1" name="status1" required>
+                    <select id="status1" name="status1" required class="form-select">
                         <option value="Accepté">Accepté</option>
                         <option value="Absent">Absent</option>
                         <option value="PI">PI</option>
                         <option value="Fermé">Fermé</option>
                         <option value="À Vendre">À Vendre</option>
                         <option value="Référent">Référent</option>
-                    </select><br><br>
+                    </select><br>
                     <label for="additionalInfo1">Informations Additionnelles :</label><br>
-                    <textarea id="additionalInfo1" name="additionalInfo1" rows="4" cols="50"></textarea><br><br>
+                    <textarea id="additionalInfo1" name="additionalInfo1" rows="4" class="form-control"></textarea><br>
                     <button id="addAddressButton1" type="button" class="btn btn-primary">Ajouter Adresse</button>
                 </form>
-                <form id="filterForm1">
+                <form id="filterForm1" class="mt-3">
                     <label for="streetFilter1">Filtrer par Rue :</label>
-                    <select id="streetFilter1" name="streetFilter1">
+                    <select id="streetFilter1" name="streetFilter1" class="form-select">
                         <option value="">Toutes les Rues</option>
-                    </select><br><br>
+                    </select><br>
                     <label for="statusFilter1">Filtrer par Statut :</label>
-                    <select id="statusFilter1" name="statusFilter1">
+                    <select id="statusFilter1" name="statusFilter1" class="form-select">
                         <option value="">Tous</option>
                         <option value="Accepté">Accepté</option>
                         <option value="Absent">Absent</option>
@@ -161,14 +165,16 @@
                         <option value="Fermé">Fermé</option>
                         <option value="À Vendre">À Vendre</option>
                         <option value="Référent">Référent</option>
-                    </select><br><br>
-                    <button type="button" id="applyFiltersButton1" class="btn btn-primary">Appliquer Filtres</button>
+                    </select><br>
+                    <button type="button" id="applyFiltersButton1" class="btn btn-primary mt-2">Appliquer Filtres</button>
                 </form>
-                <button id="displayTableButton1" class="btn btn-primary">Afficher Tableau</button>
-                <button id="exportButton1" class="btn btn-success">Exporter en Excel</button>
-                <button id="importButton1" class="btn btn-info">Importer</button>
-                <input type="file" id="importFile1" class="form-control" accept=".xlsx, .xls" style="display: none;" />
-                <table id="dataTable1" style="display: none;" class="table">
+                <div class="d-flex justify-content-between mt-3">
+                    <button id="displayTableButton1" class="btn btn-primary">Afficher Tableau</button>
+                    <button id="exportButton1" class="btn btn-success">Exporter en Excel</button>
+                    <button id="importButton1" class="btn btn-info">Importer</button>
+                </div>
+                <input type="file" id="importFile1" class="form-control mt-2" accept=".xlsx, .xls" style="display: none;" />
+                <table id="dataTable1" style="display: none;" class="table table-dark table-striped mt-3">
                     <thead>
                         <tr>
                             <th>Nom de la Rue</th>
@@ -193,7 +199,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
             if (allData1.length > 0) {
-                displayDataTable();
+                displayDataTable();  // Automatically display the table if data exists
             }
 
             document.getElementById("addStreetButton1").addEventListener("click", function() {
