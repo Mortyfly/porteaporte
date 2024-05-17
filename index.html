@@ -164,6 +164,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
+            if (allData1.length > 0) {
+                displayDataTable();  // Automatically display the table if data exists
+            }
         });
 
         function loadData() {
@@ -175,6 +178,8 @@
         function updateStreetSelections() {
             const streetSelect = document.getElementById("streetSelection1");
             const streetFilter = document.getElementById("streetFilter1");
+            streetSelect.innerHTML = '<option value="">Ajouter une nouvelle rue</option>'; // Clear and reset
+            streetFilter.innerHTML = '<option value="">Toutes les Rues</option>'; // Clear and reset
             streetsData1.forEach(street => {
                 const option = new Option(street.streetName, street.streetName);
                 streetSelect.appendChild(option);
@@ -204,6 +209,7 @@
                 document.getElementById("streetSelection1").innerHTML = '<option value="">Ajouter une nouvelle rue</option>';
                 document.getElementById("streetFilter1").innerHTML = '<option value="">Toutes les Rues</option>';
                 document.getElementById("dataBody1").innerHTML = '';
+                document.getElementById("dataTable1").style.display = 'none'; // Hide the table
                 alert("Toutes les données ont été supprimées.");
             }
         }
@@ -244,10 +250,17 @@
         });
 
         function displayDataTable() {
+            var streetFilter = document.getElementById("streetFilter1").value;
+            var statusFilter = document.getElementById("statusFilter1").value;
+            var filteredData = allData1.filter(function(data) {
+                return (streetFilter === "" || data.streetName === streetFilter) &&
+                       (statusFilter === "" || data.status === statusFilter);
+            });
+
             var dataTable = document.getElementById("dataTable1");
             var dataBody = document.getElementById("dataBody1");
             dataBody.innerHTML = '';
-            allData1.forEach(function(data, index) {
+            filteredData.forEach(function(data, index) {
                 var row = dataBody.insertRow();
                 row.insertCell(0).innerText = data.streetName;
                 row.insertCell(1).innerText = data.number;
@@ -270,7 +283,7 @@
                 actionCell.appendChild(deleteButton);
                 row.className = `status-${data.status.replace(/\.|\s/g, '-')}`;
             });
-            dataTable.style.display = 'table';
+            dataTable.style.display = filteredData.length > 0 ? 'table' : 'none';
         }
 
         function editAddress(data, index) {
@@ -279,11 +292,15 @@
             document.getElementById("status1").value = data.status;
             document.getElementById("additionalInfo1").value = data.additionalInfo;
             document.getElementById("addAddressButton1").style.display = 'none';
-            var updateButton = document.getElementById("updateAddressButton1");
-            updateButton.style.display = 'inline';
+            var updateButton = document.createElement('button');
+            updateButton.innerText = 'Mettre à jour';
+            updateButton.classList.add('btn', 'btn-primary');
             updateButton.onclick = function() {
                 updateAddress(data, index);
+                updateButton.style.display = 'none';
+                document.getElementById("addAddressButton1").style.display = 'inline';
             };
+            document.getElementById("addressForm1").appendChild(updateButton);
         }
 
         function updateAddress(data, index) {
@@ -294,8 +311,6 @@
             allData1[index] = data;
             saveData();
             displayDataTable();
-            document.getElementById("addAddressButton1").style.display = 'inline';
-            document.getElementById("updateAddressButton1").style.display = 'none';
         }
 
         function deleteAddress(index) {
@@ -303,10 +318,6 @@
             saveData();
             displayDataTable();
         }
-
-        document.getElementById("applyFiltersButton1").addEventListener("click", function() {
-            displayDataTable();
-        });
 
         document.getElementById("exportButton1").addEventListener("click", function() {
             var wb = XLSX.utils.book_new();
@@ -347,6 +358,14 @@
                 displayDataTable();
             };
             reader.readAsArrayBuffer(file);
+        });
+
+        document.getElementById("applyFiltersButton1").addEventListener("click", function() {
+            displayDataTable();
+        });
+
+        document.getElementById("displayTableButton1").addEventListener("click", function() {
+            displayDataTable();
         });
     </script>
     <!-- Bootstrap JS -->
