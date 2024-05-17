@@ -94,10 +94,14 @@
     <div class="tab-content">
         <div class="tab-pane fade show active" id="tabContent1">
             <div class="container">
+                <!-- Formulaire pour sélectionner une rue existante ou ajouter une nouvelle rue -->
                 <form id="newStreetForm1">
-                    <label for="newStreetName1">Ajouter une Nouvelle Rue :</label>
-                    <input type="text" id="newStreetName1" name="newStreetName1" required>
-                    <button id="addStreetButton1" type="button" class="btn btn-primary">Ajouter Rue</button>
+                    <label for="streetSelection1">Sélectionner ou ajouter une nouvelle rue :</label>
+                    <select id="streetSelection1" name="streetSelection1">
+                        <option value="">Ajouter une nouvelle rue</option>
+                    </select>
+                    <input type="text" id="newStreetName1" name="newStreetName1" placeholder="Nom de la nouvelle rue">
+                    <button id="addStreetButton1" type="button" class="btn btn-primary">Ajouter/Sélectionner Rue</button>
                 </form>
                 <form id="addressForm1" style="display: none;">
                     <input type="hidden" id="streetName1" name="streetName1">
@@ -115,9 +119,8 @@
                     <label for="additionalInfo1">Informations Additionnelles :</label><br>
                     <textarea id="additionalInfo1" name="additionalInfo1" rows="4" cols="50"></textarea><br><br>
                     <button id="addAddressButton1" type="button" class="btn btn-primary">Ajouter Adresse</button>
-                    <button id="updateAddressButton1" type="button" style="display: none;" class="btn btn-primary">Mettre à Jour Adresse</button>
-                    <button id="cancelUpdateButton1" type="button" style="display: none;" class="btn btn-secondary">Annuler</button>
                 </form>
+                <!-- Formulaire pour filtrer les données par rue et statut -->
                 <form id="filterForm1">
                     <label for="streetFilter1">Filtrer par Rue :</label>
                     <select id="streetFilter1" name="streetFilter1">
@@ -135,10 +138,12 @@
                     </select><br><br>
                     <button type="button" id="applyFiltersButton1" class="btn btn-primary">Appliquer Filtres</button>
                 </form>
+                <!-- Boutons pour afficher et exporter les informations -->
                 <button id="displayTableButton1" class="btn btn-primary">Afficher Tableau</button>
                 <button id="exportButton1" class="btn btn-success">Exporter en Excel</button>
                 <button id="importButton1" class="btn btn-info">Importer</button>
                 <input type="file" id="importFile1" class="form-control" accept=".xlsx, .xls" style="display: none;" />
+                <!-- Tableau pour afficher toutes les informations -->
                 <table id="dataTable1" style="display: none;" class="table">
                     <thead>
                         <tr>
@@ -154,27 +159,54 @@
             </div>
         </div>
     </div>
+    <!-- Script JavaScript pour traiter les formulaires et stocker les données -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
+        // Clés pour le Local Storage
         const allDataKey = 'allData1';
         const streetsDataKey = 'streetsData1';
+
+        // Tableaux pour stocker toutes les informations
         var allData1 = [];
         var streetsData1 = [];
+
+        // Charger les données du Local Storage au chargement de la page
         document.addEventListener('DOMContentLoaded', () => {
             allData1 = JSON.parse(localStorage.getItem(allDataKey)) || [];
             streetsData1 = JSON.parse(localStorage.getItem(streetsDataKey)) || [];
-            streetsData1.forEach(function(street) {
-                var streetFilter = document.getElementById("streetFilter1");
-                var option = document.createElement("option");
-                option.text = street.streetName;
-                streetFilter.add(option);
+            const streetSelect = document.getElementById("streetSelection1");
+            const streetFilter = document.getElementById("streetFilter1");
+            streetsData1.forEach(street => {
+                const option = new Option(street.streetName, street.streetName);
+                streetSelect.appendChild(option);
+                const filterOption = new Option(street.streetName, street.streetName);
+                streetFilter.appendChild(filterOption);
             });
-            displayDataTable();
         });
+
+        // Fonction pour ajouter ou sélectionner une rue
+        document.getElementById("addStreetButton1").addEventListener("click", function() {
+            const streetSelect = document.getElementById("streetSelection1");
+            const newStreetName = document.getElementById("newStreetName1").value.trim();
+            if (newStreetName && !streetsData1.some(street => street.streetName === newStreetName)) {
+                streetsData1.push({ streetName: newStreetName, addresses: [] });
+                const option = new Option(newStreetName, newStreetName);
+                streetSelect.appendChild(option);
+                streetSelect.value = newStreetName;
+                document.getElementById("newStreetName1").value = '';
+            }
+            document.getElementById("streetName1").value = streetSelect.value;
+            document.getElementById("addressForm1").style.display = 'block';
+            saveData();
+        });
+
+        // Fonction pour sauvegarder les données dans le Local Storage
         function saveData() {
             localStorage.setItem(allDataKey, JSON.stringify(allData1));
             localStorage.setItem(streetsDataKey, JSON.stringify(streetsData1));
         }
+
+        // Fonction pour renommer un onglet
         function renameTab(tabLinkId) {
             var newTabName = prompt("Entrez le nouveau nom de l'onglet:");
             if (newTabName) {
@@ -182,81 +214,39 @@
                 tabLink.textContent = newTabName;
             }
         }
-        document.getElementById("addStreetButton1").addEventListener("click", function(event) {
-            event.preventDefault();
-            var newStreetName = document.getElementById("newStreetName1").value;
-            if (!streetsData1.some(s => s.streetName === newStreetName)) {
-                streetsData1.push({ streetName: newStreetName, addresses: [] });
-                var streetFilter = document.getElementById("streetFilter1");
-                var option = document.createElement("option");
-                option.text = newStreetName;
-                streetFilter.add(option);
-                document.getElementById("addressForm1").style.display = "block";
-                document.getElementById("streetName1").value = newStreetName;
-                saveData();
-                document.getElementById("newStreetName1").value = '';
-            } else {
-                alert("Cette rue existe déjà.");
-            }
-        });
+
+        // Gestionnaire d'événements pour le bouton "Ajouter Adresse"
         document.getElementById("addAddressButton1").addEventListener("click", function() {
             var streetName = document.getElementById("streetName1").value;
             var number = document.getElementById("number1").value;
             var status = document.getElementById("status1").value;
             var additionalInfo = document.getElementById("additionalInfo1").value;
-            var existingEntryIndex = allData1.findIndex(data => data.streetName === streetName && data.number === number);
-            if (existingEntryIndex !== -1) {
-                allData1[existingEntryIndex] = {
-                    streetName: streetName,
-                    number: number,
-                    status: status,
-                    additionalInfo: additionalInfo
-                };
-                alert("Adresse mise à jour.");
-            } else {
-                streetsData1.forEach(function(street) {
-                    if (street.streetName === streetName) {
-                        street.addresses.push({
-                            number: number,
-                            status: status,
-                            additionalInfo: additionalInfo
-                        });
-                    }
-                });
+
+            var street = streetsData1.find(s => s.streetName === streetName);
+            if (street) {
+                var addressExists = street.addresses.some(addr => addr.number === number);
+                if (!addressExists) {
+                    street.addresses.push({ number: number, status: status, additionalInfo: additionalInfo });
+                    allData1.push({ streetName: streetName, number: number, status: status, additionalInfo: additionalInfo });
+                    saveData();
+                    displayDataTable();
+                } else {
+                    alert("Cette adresse existe déjà pour cette rue.");
+                }
             }
-            allData1 = [];
-            streetsData1.forEach(function(street) {
-                street.addresses.forEach(function(address) {
-                    allData1.push({
-                        streetName: street.streetName,
-                        number: address.number,
-                        status: address.status,
-                        additionalInfo: address.additionalInfo
-                    });
-                });
-            });
-            saveData();
-            document.getElementById("addressForm1").reset();
-            displayDataTable();
         });
+
+        // Fonction pour afficher les données sous forme de tableau
         function displayDataTable() {
             var dataTable = document.getElementById("dataTable1");
             var dataBody = document.getElementById("dataBody1");
             dataBody.innerHTML = '';
-            var filteredData = allData1.filter(function(data) {
-                var streetFilterValue = document.getElementById("streetFilter1").value;
-                var statusFilterValue = document.getElementById("statusFilter1").value;
-                var streetMatch = !streetFilterValue || data.streetName === streetFilterValue;
-                var statusMatch = !statusFilterValue || data.status === statusFilterValue;
-                return streetMatch && statusMatch;
-            });
-            filteredData.forEach(function(data, index) {
+            allData1.forEach(function(data, index) {
                 var row = dataBody.insertRow();
                 row.insertCell(0).innerText = data.streetName;
                 row.insertCell(1).innerText = data.number;
                 row.insertCell(2).innerText = data.status;
                 row.insertCell(3).innerText = data.additionalInfo;
-                row.classList.add('status-' + data.status.replace(/\s+/g, '-'));
                 var actionCell = row.insertCell(4);
                 var editButton = document.createElement('button');
                 editButton.innerText = 'Modifier';
@@ -275,24 +265,22 @@
             });
             dataTable.style.display = 'table';
         }
+
+        // Fonction pour modifier une adresse
         function editAddress(data, index) {
             document.getElementById("streetName1").value = data.streetName;
             document.getElementById("number1").value = data.number;
             document.getElementById("status1").value = data.status;
             document.getElementById("additionalInfo1").value = data.additionalInfo;
             document.getElementById("addAddressButton1").style.display = 'none';
-            document.getElementById("updateAddressButton1").style.display = 'inline';
-            document.getElementById("cancelUpdateButton1").style.display = 'inline';
-            document.getElementById("updateAddressButton1").onclick = function() {
+            var updateButton = document.getElementById("updateAddressButton1");
+            updateButton.style.display = 'inline';
+            updateButton.onclick = function() {
                 updateAddress(data, index);
             };
-            document.getElementById("cancelUpdateButton1").onclick = function() {
-                document.getElementById("addressForm1").reset();
-                document.getElementById("addAddressButton1").style.display = 'inline';
-                document.getElementById("updateAddressButton1").style.display = 'none';
-                document.getElementById("cancelUpdateButton1").style.display = 'none';
-            };
         }
+
+        // Fonction pour mettre à jour une adresse
         function updateAddress(data, index) {
             data.streetName = document.getElementById("streetName1").value;
             data.number = document.getElementById("number1").value;
@@ -301,47 +289,31 @@
             allData1[index] = data;
             saveData();
             displayDataTable();
-            document.getElementById("addressForm1").reset();
             document.getElementById("addAddressButton1").style.display = 'inline';
             document.getElementById("updateAddressButton1").style.display = 'none';
-            document.getElementById("cancelUpdateButton1").style.display = 'none';
         }
+
+        // Fonction pour supprimer une adresse
         function deleteAddress(index) {
             allData1.splice(index, 1);
-            streetsData1.forEach(function(street) {
-                street.addresses = street.addresses.filter(function(address) {
-                    return !(address.number === allData1[index].number && street.streetName === allData1[index].streetName);
-                });
-            });
             saveData();
             displayDataTable();
         }
-        document.getElementById("displayTableButton1").addEventListener("click", function() {
-            allData1 = [];
-            streetsData1.forEach(function(street) {
-                street.addresses.forEach(function(address) {
-                    allData1.push({
-                        streetName: street.streetName,
-                        number: address.number,
-                        status: address.status,
-                        additionalInfo: address.additionalInfo
-                    });
-                });
-            });
-            saveData();
-            displayDataTable();
-        });
+
+        // Gestionnaire d'événements pour le bouton "Appliquer Filtres"
         document.getElementById("applyFiltersButton1").addEventListener("click", function() {
             displayDataTable();
         });
+
+        // Fonction pour exporter les données vers un fichier Excel
         document.getElementById("exportButton1").addEventListener("click", function() {
-            var tabLink = document.querySelector('.nav-link.active');
-            var tabName = tabLink ? tabLink.textContent : 'data';
             var wb = XLSX.utils.book_new();
             var ws = XLSX.utils.json_to_sheet(allData1);
             XLSX.utils.book_append_sheet(wb, ws, "Data");
-            XLSX.writeFile(wb, `${tabName}.xlsx`);
+            XLSX.writeFile(wb, "Suivi_Porte_a_Porte.xlsx");
         });
+
+        // Fonction pour importer les données depuis un fichier Excel
         document.getElementById("importButton1").addEventListener("click", function() {
             document.getElementById("importFile1").click();
         });
@@ -355,8 +327,7 @@
                 var importedData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                 allData1 = [];
                 streetsData1 = [];
-                for (var i = 1; i < importedData.length; i++) {
-                    var row = importedData[i];
+                importedData.forEach(row => {
                     var streetName = row[0];
                     var number = row[1];
                     var status = row[2];
@@ -365,29 +336,17 @@
                     if (!street) {
                         street = { streetName: streetName, addresses: [] };
                         streetsData1.push(street);
-                        var streetFilter = document.getElementById("streetFilter1");
-                        var option = document.createElement("option");
-                        option.text = streetName;
-                        streetFilter.add(option);
                     }
-                    street.addresses.push({
-                        number: number,
-                        status: status,
-                        additionalInfo: additionalInfo
-                    });
-                    allData1.push({
-                        streetName: streetName,
-                        number: number,
-                        status: status,
-                        additionalInfo: additionalInfo
-                    });
-                }
+                    street.addresses.push({ number: number, status: status, additionalInfo: additionalInfo });
+                    allData1.push({ streetName: streetName, number: number, status: status, additionalInfo: additionalInfo });
+                });
                 saveData();
                 displayDataTable();
             };
             reader.readAsArrayBuffer(file);
         });
     </script>
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
