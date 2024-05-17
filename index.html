@@ -57,28 +57,28 @@
             background-color: #f2f2f2;
         }
         .status-Accepté {
-            background-color: #28a745;
-            color: #fff;
+            background-color: #ccff00; /* Vert citron */
+            color: #333;
         }
         .status-Référent {
-            background-color: #6f42c1;
+            background-color: #808000; /* Vert olive */
             color: #fff;
         }
         .status-Absent {
-            background-color: #ffc107;
-            color: #212529;
+            background-color: #ffff00; /* Jaune */
+            color: #333;
         }
         .status-Fermé {
-            background-color: #007bff;
+            background-color: #007bff; /* Bleu */
             color: #fff;
         }
         .status-À-Vendre {
-            background-color: #dc3545;
+            background-color: #800080; /* Violet */
             color: #fff;
         }
         .status-PI {
-            background-color: #17a2b8;
-            color: #fff;
+            background-color: #ffc0cb; /* Rose */
+            color: #333;
         }
     </style>
 </head>
@@ -88,13 +88,12 @@
         <li class="nav-item" id="tab1">
             <a class="nav-link active" id="tab1Link" data-bs-toggle="tab" href="#tabContent1">Onglet 1</a>
             <button class="btn btn-danger btn-sm" onclick="renameTab('tab1Link')">Renommer</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteTab('tab1')">Supprimer</button>
+            <button class="btn btn-danger btn-sm" onclick="clearAllData()">Supprimer</button>
         </li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane fade show active" id="tabContent1">
             <div class="container">
-                <!-- Formulaire pour sélectionner une rue existante ou ajouter une nouvelle rue -->
                 <form id="newStreetForm1">
                     <label for="streetSelection1">Sélectionner ou ajouter une nouvelle rue :</label>
                     <select id="streetSelection1" name="streetSelection1">
@@ -120,7 +119,6 @@
                     <textarea id="additionalInfo1" name="additionalInfo1" rows="4" cols="50"></textarea><br><br>
                     <button id="addAddressButton1" type="button" class="btn btn-primary">Ajouter Adresse</button>
                 </form>
-                <!-- Formulaire pour filtrer les données par rue et statut -->
                 <form id="filterForm1">
                     <label for="streetFilter1">Filtrer par Rue :</label>
                     <select id="streetFilter1" name="streetFilter1">
@@ -138,12 +136,10 @@
                     </select><br><br>
                     <button type="button" id="applyFiltersButton1" class="btn btn-primary">Appliquer Filtres</button>
                 </form>
-                <!-- Boutons pour afficher et exporter les informations -->
                 <button id="displayTableButton1" class="btn btn-primary">Afficher Tableau</button>
                 <button id="exportButton1" class="btn btn-success">Exporter en Excel</button>
                 <button id="importButton1" class="btn btn-info">Importer</button>
                 <input type="file" id="importFile1" class="form-control" accept=".xlsx, .xls" style="display: none;" />
-                <!-- Tableau pour afficher toutes les informations -->
                 <table id="dataTable1" style="display: none;" class="table">
                     <thead>
                         <tr>
@@ -159,21 +155,24 @@
             </div>
         </div>
     </div>
-    <!-- Script JavaScript pour traiter les formulaires et stocker les données -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
-        // Clés pour le Local Storage
         const allDataKey = 'allData1';
         const streetsDataKey = 'streetsData1';
-
-        // Tableaux pour stocker toutes les informations
         var allData1 = [];
         var streetsData1 = [];
 
-        // Charger les données du Local Storage au chargement de la page
         document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+
+        function loadData() {
             allData1 = JSON.parse(localStorage.getItem(allDataKey)) || [];
             streetsData1 = JSON.parse(localStorage.getItem(streetsDataKey)) || [];
+            updateStreetSelections();
+        }
+
+        function updateStreetSelections() {
             const streetSelect = document.getElementById("streetSelection1");
             const streetFilter = document.getElementById("streetFilter1");
             streetsData1.forEach(street => {
@@ -182,9 +181,33 @@
                 const filterOption = new Option(street.streetName, street.streetName);
                 streetFilter.appendChild(filterOption);
             });
-        });
+        }
 
-        // Fonction pour ajouter ou sélectionner une rue
+        function saveData() {
+            localStorage.setItem(allDataKey, JSON.stringify(allData1));
+            localStorage.setItem(streetsDataKey, JSON.stringify(streetsData1));
+        }
+
+        function renameTab(tabLinkId) {
+            var newTabName = prompt("Entrez le nouveau nom de l'onglet:");
+            if (newTabName) {
+                var tabLink = document.getElementById(tabLinkId);
+                tabLink.textContent = newTabName;
+            }
+        }
+
+        function clearAllData() {
+            if (confirm("Êtes-vous sûr de vouloir supprimer toutes les données? Cette action est irréversible!")) {
+                localStorage.clear();
+                allData1 = [];
+                streetsData1 = [];
+                document.getElementById("streetSelection1").innerHTML = '<option value="">Ajouter une nouvelle rue</option>';
+                document.getElementById("streetFilter1").innerHTML = '<option value="">Toutes les Rues</option>';
+                document.getElementById("dataBody1").innerHTML = '';
+                alert("Toutes les données ont été supprimées.");
+            }
+        }
+
         document.getElementById("addStreetButton1").addEventListener("click", function() {
             const streetSelect = document.getElementById("streetSelection1");
             const newStreetName = document.getElementById("newStreetName1").value.trim();
@@ -200,22 +223,6 @@
             saveData();
         });
 
-        // Fonction pour sauvegarder les données dans le Local Storage
-        function saveData() {
-            localStorage.setItem(allDataKey, JSON.stringify(allData1));
-            localStorage.setItem(streetsDataKey, JSON.stringify(streetsData1));
-        }
-
-        // Fonction pour renommer un onglet
-        function renameTab(tabLinkId) {
-            var newTabName = prompt("Entrez le nouveau nom de l'onglet:");
-            if (newTabName) {
-                var tabLink = document.getElementById(tabLinkId);
-                tabLink.textContent = newTabName;
-            }
-        }
-
-        // Gestionnaire d'événements pour le bouton "Ajouter Adresse"
         document.getElementById("addAddressButton1").addEventListener("click", function() {
             var streetName = document.getElementById("streetName1").value;
             var number = document.getElementById("number1").value;
@@ -236,7 +243,6 @@
             }
         });
 
-        // Fonction pour afficher les données sous forme de tableau
         function displayDataTable() {
             var dataTable = document.getElementById("dataTable1");
             var dataBody = document.getElementById("dataBody1");
@@ -262,11 +268,11 @@
                     deleteAddress(index);
                 };
                 actionCell.appendChild(deleteButton);
+                row.className = `status-${data.status.replace(/\.|\s/g, '-')}`;
             });
             dataTable.style.display = 'table';
         }
 
-        // Fonction pour modifier une adresse
         function editAddress(data, index) {
             document.getElementById("streetName1").value = data.streetName;
             document.getElementById("number1").value = data.number;
@@ -280,7 +286,6 @@
             };
         }
 
-        // Fonction pour mettre à jour une adresse
         function updateAddress(data, index) {
             data.streetName = document.getElementById("streetName1").value;
             data.number = document.getElementById("number1").value;
@@ -293,19 +298,16 @@
             document.getElementById("updateAddressButton1").style.display = 'none';
         }
 
-        // Fonction pour supprimer une adresse
         function deleteAddress(index) {
             allData1.splice(index, 1);
             saveData();
             displayDataTable();
         }
 
-        // Gestionnaire d'événements pour le bouton "Appliquer Filtres"
         document.getElementById("applyFiltersButton1").addEventListener("click", function() {
             displayDataTable();
         });
 
-        // Fonction pour exporter les données vers un fichier Excel
         document.getElementById("exportButton1").addEventListener("click", function() {
             var wb = XLSX.utils.book_new();
             var ws = XLSX.utils.json_to_sheet(allData1);
@@ -313,10 +315,10 @@
             XLSX.writeFile(wb, "Suivi_Porte_a_Porte.xlsx");
         });
 
-        // Fonction pour importer les données depuis un fichier Excel
         document.getElementById("importButton1").addEventListener("click", function() {
             document.getElementById("importFile1").click();
         });
+
         document.getElementById("importFile1").addEventListener("change", function(event) {
             var file = event.target.files[0];
             var reader = new FileReader();
@@ -341,6 +343,7 @@
                     allData1.push({ streetName: streetName, number: number, status: status, additionalInfo: additionalInfo });
                 });
                 saveData();
+                updateStreetSelections();
                 displayDataTable();
             };
             reader.readAsArrayBuffer(file);
