@@ -131,7 +131,7 @@
         </div>
     </header>
     <div class="banner">
-        <img src="https://drive.google.com/uc?export=view&id=1LJuD4Eb9zpHgKAD-UIPmXHELPfzGi7xJ" alt="TERRE D'IMMO - Votre agence immobilière" class="img-fluid">
+        <img src="https://cvws.icloud-content.com/B/ATeSNdpA7oMM12LIcnabh1iV91s8AVKIrFU5f-D4j0hx-bOW_AEZhDDI/oui.png?o=AqdZ5kvGSsKRkZCUTlJzCG1H30EQlgCk9C1V4UbbwVyw&v=1&x=3&a=CAogdcnNLU-Qp-fVe8mbVBNAaPYQrd35J3OCPgkacCbHrWISbRDrpeTG-DEY64LAyPgxIgEAUgSV91s8WgQZhDDIaiZOhZ3kwbA20JJUrTcF7_B4kufwVwozs4kRfVgRwIJRTPcesFx7_HIm2twt6-0uEVplWzENvWf5yHgLJxxalM4kYsyIzgYyLO331PE2BPk&e=1715991478&fl=&r=bdad59ce-2732-4c89-bacf-5c9c4e7ea74a-1&k=QFiv7_RNXMA1Omvls9Am6Q&ckc=com.apple.clouddocs&ckz=com.apple.CloudDocs&p=139&s=LAlyMHTev9vw51_tdwi0vWmFBEA&cd=i" alt="TERRE D'IMMO - Votre agence immobilière" class="img-fluid">
     </div>
     <div class="container">
         <ul class="nav nav-tabs" id="myTabs">
@@ -221,7 +221,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
             if (allData1.length > 0) {
-                displayDataTable();  // Automatically display the table if data exists
+                displayDataTable();  // Afficher automatiquement le tableau si des données existent
             }
 
             document.getElementById("addStreetButton1").addEventListener("click", function() {
@@ -233,6 +233,9 @@
                     streetSelect.appendChild(option);
                     streetSelect.value = newStreetName;
                     document.getElementById("newStreetName1").value = '';
+                } else if (!newStreetName) {
+                    alert("Le nom de la rue ne peut pas être vide.");
+                    return;
                 }
                 document.getElementById("streetName1").value = streetSelect.value;
                 document.getElementById("addressForm1").style.display = 'block';
@@ -241,9 +244,14 @@
 
             document.getElementById("addAddressButton1").addEventListener("click", function() {
                 var streetName = document.getElementById("streetName1").value;
-                var number = document.getElementById("number1").value;
+                var number = document.getElementById("number1").value.trim();
                 var status = document.getElementById("status1").value;
-                var additionalInfo = document.getElementById("additionalInfo1").value;
+                var additionalInfo = document.getElementById("additionalInfo1").value.trim();
+
+                if (!number) {
+                    alert("Le numéro ne peut pas être vide.");
+                    return;
+                }
 
                 var street = streetsData1.find(s => s.streetName === streetName);
                 if (street) {
