@@ -203,6 +203,8 @@
                     </thead>
                     <tbody id="dataBody1"></tbody>
                 </table>
+                <div id="chartContainer1" style="width: 100%; height: 400px;"></div> <!-- Conteneur pour le graphique -->
+                <canvas id="statusChart"></canvas> <!-- Ajout du canvas pour le graphique -->
             </div>
         </div>
     </div>
@@ -212,6 +214,7 @@
         </div>
     </footer>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js pour les graphiques -->
     <script>
         const allDataKey = 'allData1';
         const streetsDataKey = 'streetsData1';
@@ -221,7 +224,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
             if (allData1.length > 0) {
-                displayDataTable();  // Afficher automatiquement le tableau si des données existent
+                displayDataTable();
+                updateChart();
             }
 
             document.getElementById("addStreetButton1").addEventListener("click", addStreet);
@@ -229,21 +233,29 @@
             document.getElementById("exportButton1").addEventListener("click", exportData);
             document.getElementById("importButton1").addEventListener("click", () => document.getElementById("importFile1").click());
             document.getElementById("importFile1").addEventListener("change", importData);
-            document.getElementById("applyFiltersButton1").addEventListener("click", displayDataTable);
+            document.getElementById("applyFiltersButton1").addEventListener("click", () => {
+                displayDataTable();
+                updateChart();
+            });
             document.getElementById("displayTableButton1").addEventListener("click", displayDataTable);
         });
 
         function addStreet() {
             const streetSelect = document.getElementById("streetSelection1");
             const newStreetName = document.getElementById("newStreetName1").value.trim();
-            if (newStreetName && !streetsData1.some(street => street.streetName === newStreetName)) {
-                streetsData1.push({ streetName: newStreetName, addresses: [] });
-                const option = new Option(newStreetName, newStreetName);
-                streetSelect.appendChild(option);
-                streetSelect.value = newStreetName;
-                document.getElementById("newStreetName1").value = '';
-            } else if (!newStreetName) {
-                alert("Le nom de la rue ne peut pas être vide.");
+            if (newStreetName) {
+                if (!streetsData1.some(street => street.streetName === newStreetName)) {
+                    streetsData1.push({ streetName: newStreetName, addresses: [] });
+                    const option = new Option(newStreetName, newStreetName);
+                    streetSelect.appendChild(option);
+                    streetSelect.value = newStreetName;
+                    document.getElementById("newStreetName1").value = '';
+                }
+            } else if (streetSelect.value) {
+                document.getElementById("streetName1").value = streetSelect.value;
+                document.getElementById("addressForm1").style.display = 'block';
+            } else {
+                alert("Veuillez sélectionner une rue ou en ajouter une nouvelle.");
                 return;
             }
             document.getElementById("streetName1").value = streetSelect.value;
@@ -270,6 +282,7 @@
                     allData1.push({ streetName, number, status, additionalInfo });
                     saveData();
                     displayDataTable();
+                    updateChart();
                 } else {
                     alert("Cette adresse existe déjà pour cette rue.");
                 }
@@ -309,6 +322,7 @@
                 saveData();
                 updateStreetSelections();
                 displayDataTable();
+                updateChart();
             };
             reader.readAsArrayBuffer(file);
         }
@@ -425,6 +439,7 @@
             allData1[index] = { streetName: updatedStreetName, number: updatedNumber, status: updatedStatus, additionalInfo: updatedAdditionalInfo };
             saveData();
             displayDataTable();
+            updateChart();
         }
 
         function deleteAddress(index) {
@@ -439,6 +454,63 @@
             allData1.splice(index, 1);
             saveData();
             displayDataTable();
+            updateChart();
+        }
+
+        function updateChart() {
+            const streetFilter = document.getElementById("streetFilter1").value;
+            const statusFilter = document.getElementById("statusFilter1").value;
+            const filteredData = allData1.filter(data => {
+                return (!streetFilter || data.streetName === streetFilter) &&
+                       (!statusFilter || data.status === statusFilter);
+            });
+
+            const statusCounts = filteredData.reduce((counts, data) => {
+                counts[data.status] = (counts[data.status] || 0) + 1;
+                return counts;
+            }, {});
+
+            const labels = Object.keys(statusCounts);
+            const data = Object.values(statusCounts);
+
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            if (window.myChart) {
+                window.myChart.destroy();
+            }
+            window.myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nombre d\'adresses',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
         }
     </script>
     <!-- Bootstrap JS -->
