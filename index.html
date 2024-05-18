@@ -272,9 +272,10 @@
     <script>
         const allDataKey = 'allData1';
         const streetsDataKey = 'streetsData1';
+        const tabNameKey = 'tabName1';
         let allData1 = [];
         let streetsData1 = [];
-        let currentTabName = 'Onglet 1'; // Initial tab name
+        let currentTabName = localStorage.getItem(tabNameKey) || 'Onglet 1'; // Initial tab name
         let counter = 0;
         let map;
         let markers = [];
@@ -302,6 +303,9 @@
             document.getElementById("incrementButton").addEventListener("click", incrementCounter);
             document.getElementById("decrementButton").addEventListener("click", decrementCounter);
             document.getElementById("resetButton").addEventListener("click", resetCounter);
+
+            // Afficher le nom de l'onglet sauvegardé
+            document.getElementById('tab1Link').textContent = currentTabName;
         });
 
         function addStreet() {
@@ -396,6 +400,7 @@
         function saveData() {
             localStorage.setItem(allDataKey, JSON.stringify(allData1));
             localStorage.setItem(streetsDataKey, JSON.stringify(streetsData1));
+            localStorage.setItem(tabNameKey, currentTabName);
         }
 
         function updateStreetSelections() {
@@ -417,6 +422,7 @@
                 const tabLink = document.getElementById(tabLinkId);
                 tabLink.textContent = newTabName;
                 currentTabName = newTabName; // Mettre à jour le nom de l'onglet courant
+                saveData(); // Enregistrer le nouveau nom de l'onglet
             }
         }
 
@@ -481,6 +487,7 @@
                 updateAddress(data, index);
                 updateButton.remove();
                 document.getElementById("addAddressButton1").style.display = 'inline';
+                updateMapMarkers(); // Mettre à jour les marqueurs de la carte
             };
             document.getElementById("addressForm1").appendChild(updateButton);
         }
