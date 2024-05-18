@@ -6,6 +6,8 @@
     <title>Suivi Porte-à-Porte</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
         body {
             background-color: #15202b;
@@ -158,6 +160,10 @@
         .tab-actions button {
             margin-left: 10px;
         }
+        #map {
+            height: 500px;
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
@@ -224,7 +230,7 @@
                     <select id="statusFilter1" name="statusFilter1" class="form-select mb-2">
                         <option value="">Tous</option>
                         <option value="Accepté">Accepté</option>
-                        <option value="Absent">Absent</option>
+                        <option value="Absent">Absent</value>
                         <option value="PI">PI</option>
                         <option value="Fermé">Fermé</option>
                         <option value="À Vendre">À Vendre</option>
@@ -250,7 +256,8 @@
                     </thead>
                     <tbody id="dataBody1"></tbody>
                 </table>
-                <canvas id="statusChart" class="mt-4" style="background-color: #ffffff;"></canvas> <!-- Ajout du canvas pour le graphique -->
+                <canvas id="statusChart" class="mt-4" style="background-color: #ffffff;"></canvas>
+                <div id="map"></div> <!-- Ajout du conteneur pour la carte -->
             </div>
         </div>
     </div>
@@ -261,6 +268,7 @@
     </footer>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js pour les graphiques -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script> <!-- Leaflet.js pour la carte -->
     <script>
         const allDataKey = 'allData1';
         const streetsDataKey = 'streetsData1';
@@ -268,12 +276,14 @@
         let streetsData1 = [];
         let currentTabName = 'Onglet 1'; // Initial tab name
         let counter = 0;
+        let map, markersLayer;
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
             if (allData1.length > 0) {
                 displayDataTable();
                 updateChart();
+                updateMap();
             }
 
             document.getElementById("addStreetButton1").addEventListener("click", addStreet);
@@ -284,12 +294,16 @@
             document.getElementById("applyFiltersButton1").addEventListener("click", () => {
                 displayDataTable();
                 updateChart();
+                updateMap();
             });
             document.getElementById("displayTableButton1").addEventListener("click", displayDataTable);
             document.getElementById("toggleCounterButton").addEventListener("click", toggleCounter);
             document.getElementById("incrementButton").addEventListener("click", incrementCounter);
             document.getElementById("decrementButton").addEventListener("click", decrementCounter);
             document.getElementById("resetButton").addEventListener("click", resetCounter);
+
+            // Initialiser la carte
+            initMap();
         });
 
         function addStreet() {
@@ -335,6 +349,7 @@
                     saveData();
                     displayDataTable();
                     updateChart();
+                    updateMap();
                 } else {
                     alert("Cette adresse existe déjà pour cette rue.");
                 }
@@ -375,6 +390,7 @@
                 updateStreetSelections();
                 displayDataTable();
                 updateChart();
+                updateMap();
             };
             reader.readAsArrayBuffer(file);
         }
@@ -495,6 +511,7 @@
             saveData();
             displayDataTable();
             updateChart();
+            updateMap();
         }
 
         function deleteAddress(index) {
@@ -510,6 +527,7 @@
             saveData();
             displayDataTable();
             updateChart();
+            updateMap();
         }
 
         function updateChart() {
@@ -563,6 +581,43 @@
                     }
                 }
             });
+        }
+
+        function initMap() {
+            map = L.map('map').setView([48.8566, 2.3522], 12); // Initialiser la carte à Paris par défaut
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+            markersLayer = L.layerGroup().addTo(map);
+        }
+
+        function updateMap() {
+            markersLayer.clearLayers();
+            const streetFilter = document.getElementById("streetFilter1").value;
+            const statusFilter = document.getElementById("statusFilter1").value;
+            const filteredData = allData1.filter(data => {
+                return (!streetFilter || data.streetName === streetFilter) &&
+                       (!statusFilter || data.status === statusFilter);
+            });
+
+            filteredData.forEach(data => {
+                const address = `${data.number} ${data.streetName}, ${currentTabName}`;
+                geocodeAddress(address, data.status);
+            });
+        }
+
+        function geocodeAddress(address, status) {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        const lat = data[0].lat;
+                        const lon = data[0].lon;
+                        const marker = L.marker([lat, lon]).addTo(markersLayer);
+                        marker.bindPopup(`<b>${address}</b><br>${status}`);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
 
         function toggleCounter() {
