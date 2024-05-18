@@ -106,7 +106,7 @@
             background-color: #1da1f2;
             color: #ffffff;
         }
-        .status-À Vendre {
+        .status-À-Vendre {
             background-color: #794bc4;
             color: #ffffff;
         }
@@ -276,6 +276,8 @@
         let streetsData1 = [];
         let currentTabName = 'Onglet 1'; // Initial tab name
         let counter = 0;
+        let map;
+        let markers = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
@@ -313,12 +315,6 @@
                     streetSelect.value = newStreetName;
                     document.getElementById("newStreetName1").value = '';
                 }
-            } else if (streetSelect.value) {
-                document.getElementById("streetName1").value = streetSelect.value;
-                document.getElementById("addressForm1").style.display = 'block';
-            } else {
-                alert("Veuillez sélectionner une rue ou en ajouter une nouvelle.");
-                return;
             }
             document.getElementById("streetName1").value = streetSelect.value;
             document.getElementById("addressForm1").style.display = 'block';
@@ -605,10 +601,6 @@
             document.getElementById('counter').innerText = counter;
         }
 
-        // Initialiser la carte avec Leaflet
-        let map;
-        let markers = [];
-
         function initializeMap() {
             map = L.map('map').setView([48.8566, 2.3522], 12); // Centrer la carte sur Paris
 
@@ -635,7 +627,7 @@
         }
 
         function geocodeAddress(address, status) {
-            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=pk.eyJ1IjoibW9ydHlmbHkiLCJhIjoiY2x3YnlmMGZwMHQ3cTJxbXlraDM5NDF2eiJ9.UpXbLtWmOgWqiySddA4kPA`)
+            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=sk.eyJ1IjoibW9ydHlmbHkiLCJhIjoiY2x3Yno1aHBqMHI1eTJqbXl1NnIwb3F3YSJ9.6BamEVonYCpU9vuN4bp0Tg`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.features.length > 0) {
