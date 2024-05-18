@@ -217,6 +217,35 @@
                 height: 200px;
             }
         }
+        .icon-accepted {
+            background-color: #17bf63;
+            color: #ffffff;
+        }
+
+        .icon-absent {
+            background-color: #ffad1f;
+            color: #ffffff;
+        }
+
+        .icon-pi {
+            background-color: #e0245e;
+            color: #ffffff;
+        }
+
+        .icon-ferme {
+            background-color: #1da1f2;
+            color: #ffffff;
+        }
+
+        .icon-avendre {
+            background-color: #794bc4;
+            color: #ffffff;
+        }
+
+        .icon-referent {
+            background-color: #005f56;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -714,7 +743,42 @@
                     if (data.features.length > 0) {
                         const feature = data.features[0];
                         const latlng = [feature.center[1], feature.center[0]];
-                        const marker = L.marker(latlng).addTo(map);
+
+                        // Définir l'icône personnalisée en fonction du statut
+                        let iconClass = '';
+                        switch (status) {
+                            case 'Accepté':
+                                iconClass = 'icon-accepted';
+                                break;
+                            case 'Absent':
+                                iconClass = 'icon-absent';
+                                break;
+                            case 'PI':
+                                iconClass = 'icon-pi';
+                                break;
+                            case 'Fermé':
+                                iconClass = 'icon-ferme';
+                                break;
+                            case 'À Vendre':
+                                iconClass = 'icon-avendre';
+                                break;
+                            case 'Référent':
+                                iconClass = 'icon-referent';
+                                break;
+                            default:
+                                iconClass = 'icon-default';
+                        }
+
+                        const customIcon = L.divIcon({
+                            className: `custom-marker ${iconClass}`,
+                            html: `<i class="${iconClass}"></i>`,
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowSize: [41, 41]
+                        });
+
+                        const marker = L.marker(latlng, { icon: customIcon }).addTo(map);
                         marker.bindPopup(`<b>${status}</b><br>${address}`).openPopup();
                         markers.push(marker);
                     }
