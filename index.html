@@ -7,7 +7,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" integrity="sha384-q/5eqfuUCC4Z4VsyYmiXrmPcKfiPB7BO+yBC46AtT9bkiRnrlrrcbbFh0E5f/2hn" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
     <style>
         body {
             background-color: #15202b;
@@ -268,7 +268,7 @@
     </footer>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js pour les graphiques -->
-    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js" integrity="sha384-4oMcBhObeiTPRO3NJ4dsaUqZRO4vFd6UcmD8O2wEID6uDeHzDxkhXzVcvsOaxX20" crossorigin=""></script> <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script> <!-- Leaflet JS -->
     <script>
         const allDataKey = 'allData1';
         const streetsDataKey = 'streetsData1';
@@ -604,7 +604,7 @@
         function initializeMap() {
             map = L.map('map').setView([48.8566, 2.3522], 12); // Centrer la carte sur Paris
 
-            L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibW9ydHlmbHkiLCJhIjoiY2x3YnlmMGZwMHQ3cTJxbXlraDM5NDF2eiJ9.UpXbLtWmOgWqiySddA4kPA', {
+            L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=sk.eyJ1IjoibW9ydHlmbHkiLCJhIjoiY2x3Yno1aHBqMHI1eTJqbXl1NnIwb3F3YSJ9.6BamEVonYCpU9vuN4bp0Tg', {
                 maxZoom: 18,
                 id: 'mapbox/streets-v11',
                 tileSize: 512,
