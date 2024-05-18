@@ -129,6 +129,14 @@
         .nav-tabs .nav-link {
             color: #ffffff;
         }
+        .counter-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .counter {
+            font-size: 2rem;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -141,6 +149,13 @@
         <img src="https://cvws.icloud-content.com/B/ATeSNdpA7oMM12LIcnabh1iV91s8AVKIrFU5f-D4j0hx-bOW_AEZhDDI/oui.png?o=AqdZ5kvGSsKRkZCUTlJzCG1H30EQlgCk9C1V4UbbwVyw&v=1&x=3&a=CAogdcnNLU-Qp-fVe8mbVBNAaPYQrd35J3OCPgkacCbHrWISbRDrpeTG-DEY64LAyPgxIgEAUgSV91s8WgQZhDDIaiZOhZ3kwbA20JJUrTcF7_B4kufwVwozs4kRfVgRwIJRTPcesFx7_HIm2twt6-0uEVplWzENvWf5yHgLJxxalM4kYsyIzgYyLO331PE2BPk&e=1715991478&fl=&r=bdad59ce-2732-4c89-bacf-5c9c4e7ea74a-1&k=QFiv7_RNXMA1Omvls9Am6Q&ckc=com.apple.clouddocs&ckz=com.apple.CloudDocs&p=139&s=LAlyMHTev9vw51_tdwi0vWmFBEA&cd=i" alt="TERRE D'IMMO - Votre agence immobilière" class="img-fluid">
     </div>
     <div class="container">
+        <button id="toggleCounterButton" class="btn btn-info">Afficher/Masquer le Compteur</button>
+        <div id="counterContainer" class="counter-container" style="display: none;">
+            <div class="counter" id="counter">0</div>
+            <button id="incrementButton" class="btn btn-primary">+1</button>
+            <button id="decrementButton" class="btn btn-danger">-1</button>
+            <button id="resetButton" class="btn btn-success">Réinitialiser</button>
+        </div>
         <ul class="nav nav-tabs" id="myTabs">
             <li class="nav-item" id="tab1">
                 <a class="nav-link active" id="tab1Link" data-bs-toggle="tab" href="#tabContent1">Onglet 1</a>
@@ -227,6 +242,7 @@
         let allData1 = [];
         let streetsData1 = [];
         let currentTabName = 'Onglet 1'; // Initial tab name
+        let counter = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
@@ -245,6 +261,10 @@
                 updateChart();
             });
             document.getElementById("displayTableButton1").addEventListener("click", displayDataTable);
+            document.getElementById("toggleCounterButton").addEventListener("click", toggleCounter);
+            document.getElementById("incrementButton").addEventListener("click", incrementCounter);
+            document.getElementById("decrementButton").addEventListener("click", decrementCounter);
+            document.getElementById("resetButton").addEventListener("click", resetCounter);
         });
 
         function addStreet() {
@@ -516,6 +536,32 @@
                     }
                 }
             });
+        }
+
+        function toggleCounter() {
+            const counterContainer = document.getElementById('counterContainer');
+            if (counterContainer.style.display === 'none') {
+                counterContainer.style.display = 'block';
+            } else {
+                counterContainer.style.display = 'none';
+            }
+        }
+
+        function incrementCounter() {
+            counter++;
+            document.getElementById('counter').innerText = counter;
+        }
+
+        function decrementCounter() {
+            if (counter > 0) {
+                counter--;
+                document.getElementById('counter').innerText = counter;
+            }
+        }
+
+        function resetCounter() {
+            counter = 0;
+            document.getElementById('counter').innerText = counter;
         }
     </script>
     <!-- Bootstrap JS -->
