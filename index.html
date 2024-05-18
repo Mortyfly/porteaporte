@@ -217,6 +217,35 @@
                 height: 200px;
             }
         }
+        .icon-accepted {
+            background-color: #17bf63;
+            color: #ffffff;
+        }
+
+        .icon-absent {
+            background-color: #ffad1f;
+            color: #ffffff;
+        }
+
+        .icon-pi {
+            background-color: #e0245e;
+            color: #ffffff;
+        }
+
+        .icon-ferme {
+            background-color: #1da1f2;
+            color: #ffffff;
+        }
+
+        .icon-avendre {
+            background-color: #794bc4;
+            color: #ffffff;
+        }
+
+        .icon-referent {
+            background-color: #005f56;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -716,32 +745,33 @@
                         const latlng = [feature.center[1], feature.center[0]];
 
                         // Définir l'icône personnalisée en fonction du statut
-                        let iconUrl = '';
+                        let iconClass = '';
                         switch (status) {
                             case 'Accepté':
-                                iconUrl = 'images/custom-marker-accepted.png';
+                                iconClass = 'icon-accepted';
                                 break;
                             case 'Absent':
-                                iconUrl = 'images/custom-marker-absent.png';
+                                iconClass = 'icon-absent';
                                 break;
                             case 'PI':
-                                iconUrl = 'images/custom-marker-pi.png';
+                                iconClass = 'icon-pi';
                                 break;
                             case 'Fermé':
-                                iconUrl = 'images/custom-marker-ferme.png';
+                                iconClass = 'icon-ferme';
                                 break;
                             case 'À Vendre':
-                                iconUrl = 'images/custom-marker-avendre.png';
+                                iconClass = 'icon-avendre';
                                 break;
                             case 'Référent':
-                                iconUrl = 'images/custom-marker-referent.png';
+                                iconClass = 'icon-referent';
                                 break;
                             default:
-                                iconUrl = 'images/custom-marker-default.png';
+                                iconClass = 'icon-default';
                         }
 
-                        const customIcon = L.icon({
-                            iconUrl: iconUrl,
+                        const customIcon = L.divIcon({
+                            className: `custom-marker ${iconClass}`,
+                            html: `<i class="${iconClass}"></i>`,
                             iconSize: [25, 41],
                             iconAnchor: [12, 41],
                             popupAnchor: [1, -34],
