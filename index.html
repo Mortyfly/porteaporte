@@ -87,7 +87,7 @@
             border: 1px solid #37444d;
             padding: 10px;
             text-align: left;
-            word-break: break-word; /* Ajout pour rendre le texte responsive */
+            word-break: break-word;
         }
         table th {
             background-color: #1da1f2;
@@ -176,7 +176,6 @@
             pointer-events: none;
             opacity: 0.6;
         }
-        /* Media Queries pour rendre le site responsive */
         @media (max-width: 767px) {
             h1 {
                 font-size: 1.5rem;
@@ -223,42 +222,36 @@
             width: 10px;
             height: 10px;
         }
-
         .icon-absent {
             background-color: #ffad1f;
             color: #ffffff;
             width: 10px;
             height: 10px;
         }
-
         .icon-pi {
             background-color: #e0245e;
             color: #ffffff;
             width: 10px;
             height: 10px;
         }
-
         .icon-ferme {
             background-color: #1da1f2;
             color: #ffffff;
             width: 10px;
             height: 10px;
         }
-
         .icon-avendre {
             background-color: #794bc4;
             color: #ffffff;
             width: 10px;
             height: 10px;
         }
-
         .icon-referent {
             background-color: #005f56;
             color: #ffffff;
             width: 10px;
             height: 10px;
         }
-
         .custom-marker {
             width: 10px;
             height: 10px;
@@ -485,11 +478,9 @@
                 const importedData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                 allData1 = [];
                 streetsData1 = [];
-                importedData.forEach(row => {
-                    const streetName = row[0];
-                    const number = row[1];
-                    const status = row[2];
-                    const additionalInfo = row[3];
+                importedData.forEach((row, index) => {
+                    if (index === 0) return; // Skip header row
+                    const [streetName, number, status, additionalInfo] = row;
                     let street = streetsData1.find(s => s.streetName === streetName);
                     if (!street) {
                         street = { streetName, addresses: [] };
@@ -790,9 +781,9 @@
                         const customIcon = L.divIcon({
                             className: `custom-marker ${iconClass}`,
                             html: `<i class="${iconClass}"></i>`,
-                            iconSize: [10, 10], // Taille réduite
-                            iconAnchor: [5, 5], // Ancrer au centre
-                            popupAnchor: [0, -5] // Ajuster la position du popup
+                            iconSize: [10, 10],
+                            iconAnchor: [5, 5],
+                            popupAnchor: [0, -5]
                         });
 
                         const marker = L.marker(latlng, { icon: customIcon }).addTo(map);
