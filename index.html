@@ -220,31 +220,49 @@
         .icon-accepted {
             background-color: #17bf63;
             color: #ffffff;
+            width: 10px; /* Réduire la taille */
+            height: 10px; /* Réduire la taille */
         }
 
         .icon-absent {
             background-color: #ffad1f;
             color: #ffffff;
+            width: 10px; /* Réduire la taille */
+            height: 10px; /* Réduire la taille */
         }
 
         .icon-pi {
             background-color: #e0245e;
             color: #ffffff;
+            width: 10px; /* Réduire la taille */
+            height: 10px; /* Réduire la taille */
         }
 
         .icon-ferme {
             background-color: #1da1f2;
             color: #ffffff;
+            width: 10px; /* Réduire la taille */
+            height: 10px; /* Réduire la taille */
         }
 
         .icon-avendre {
             background-color: #794bc4;
             color: #ffffff;
+            width: 10px; /* Réduire la taille */
+            height: 10px; /* Réduire la taille */
         }
 
         .icon-referent {
             background-color: #005f56;
             color: #ffffff;
+            width: 10px; /* Réduire la taille */
+            height: 10px; /* Réduire la taille */
+        }
+
+        .custom-marker {
+            width: 10px; /* Réduire la taille */
+            height: 10px; /* Réduire la taille */
+            border-radius: 0; /* Rendre les marqueurs carrés */
         }
     </style>
 </head>
@@ -255,7 +273,7 @@
         </div>
     </header>
     <div class="banner">
-        <img src="https://i.ibb.co/YfHcMH3/oui.png" alt="oui" border="0"></a>
+        <img src="https://i.ibb.co/YfHcMH3/oui.png" alt="oui" border="0">
     </div>
     <div class="container">
         <button id="toggleCounterButton" class="btn btn-info mb-3 disabled">Afficher/Masquer le Compteur</button>
@@ -772,10 +790,9 @@
                         const customIcon = L.divIcon({
                             className: `custom-marker ${iconClass}`,
                             html: `<i class="${iconClass}"></i>`,
-                            iconSize: [25, 41],
-                            iconAnchor: [12, 41],
-                            popupAnchor: [1, -34],
-                            shadowSize: [41, 41]
+                            iconSize: [10, 10], // Taille réduite
+                            iconAnchor: [5, 5], // Ancrer au centre
+                            popupAnchor: [0, -5] // Ajuster la position du popup
                         });
 
                         const marker = L.marker(latlng, { icon: customIcon }).addTo(map);
