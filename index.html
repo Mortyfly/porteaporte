@@ -336,6 +336,12 @@
                         <option value="À Vendre">À Vendre</option>
                         <option value="Référent">Référent</option>
                     </select>
+                    <label for="sortOrder1">Trier par :</label>
+                    <select id="sortOrder1" name="sortOrder1" class="form-select mb-2">
+                        <option value="alphabetical">Ordre alphabétique</option>
+                        <option value="oldest">Du plus ancien au plus récent</option>
+                        <option value="newest">Du plus récent au plus ancien</option>
+                    </select>
                     <button type="button" id="applyFiltersButton1" class="btn btn-primary mt-2">Appliquer Filtres</button>
                 </form>
                 <div class="d-flex justify-content-between mt-4">
@@ -562,12 +568,24 @@
         function displayDataTable() {
             const streetFilter = document.getElementById("streetFilter1").value;
             const statusFilter = document.getElementById("statusFilter1").value;
-            const filteredData = allData1.filter(data => {
+            const sortOrder = document.getElementById("sortOrder1").value;
+
+            let filteredData = allData1.filter(data => {
                 return (!streetFilter || data.streetName === streetFilter) &&
                        (!statusFilter || data.status === statusFilter);
             });
 
-            filteredData.sort((a, b) => a.streetName.localeCompare(b.streetName)); // Trier les données par nom de rue
+            switch (sortOrder) {
+                case 'alphabetical':
+                    filteredData.sort((a, b) => a.streetName.localeCompare(b.streetName));
+                    break;
+                case 'oldest':
+                    filteredData.sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
+                    break;
+                case 'newest':
+                    filteredData.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+                    break;
+            }
 
             const dataTable = document.getElementById("dataTable1");
             const dataBody = document.getElementById("dataBody1");
@@ -807,3 +825,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
