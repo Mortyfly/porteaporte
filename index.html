@@ -176,7 +176,14 @@
             pointer-events: none;
             opacity: 0.6;
         }
-        /* Media Queries pour rendre le site responsive */
+        .alert {
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            display: none; /* Initially hidden */
+        }
         @media (max-width: 767px) {
             h1 {
                 font-size: 1.5rem;
@@ -217,48 +224,12 @@
                 height: 200px;
             }
         }
-        .icon-accepted {
+        .icon-accepted, .icon-absent, .icon-pi, .icon-ferme, .icon-avendre, .icon-referent {
             background-color: #17bf63;
             color: #ffffff;
             width: 10px; /* Réduire la taille */
             height: 10px; /* Réduire la taille */
         }
-
-        .icon-absent {
-            background-color: #ffad1f;
-            color: #ffffff;
-            width: 10px; /* Réduire la taille */
-            height: 10px; /* Réduire la taille */
-        }
-
-        .icon-pi {
-            background-color: #e0245e;
-            color: #ffffff;
-            width: 10px; /* Réduire la taille */
-            height: 10px; /* Réduire la taille */
-        }
-
-        .icon-ferme {
-            background-color: #1da1f2;
-            color: #ffffff;
-            width: 10px; /* Réduire la taille */
-            height: 10px; /* Réduire la taille */
-        }
-
-        .icon-avendre {
-            background-color: #794bc4;
-            color: #ffffff;
-            width: 10px; /* Réduire la taille */
-            height: 10px; /* Réduire la taille */
-        }
-
-        .icon-referent {
-            background-color: #005f56;
-            color: #ffffff;
-            width: 10px; /* Réduire la taille */
-            height: 10px; /* Réduire la taille */
-        }
-
         .custom-marker {
             width: 10px; /* Réduire la taille */
             height: 10px; /* Réduire la taille */
@@ -276,27 +247,35 @@
         <img src="https://i.ibb.co/YfHcMH3/oui.png" alt="oui" border="0">
     </div>
     <div class="container">
-        <button id="toggleCounterButton" class="btn btn-info mb-3 disabled">Afficher/Masquer le Compteur</button>
+        <!-- Alert for visual confirmation -->
+        <div id="alertPlaceholder"></div>
+
+        <!-- Counter UI -->
+        <button id="toggleCounterButton" class="btn btn-info mb-3">Afficher/Masquer le Compteur</button>
         <div id="counterContainer" class="counter-container" style="display: none;">
             <div class="counter" id="counter">0</div>
             <div class="button-group">
-                <button id="incrementButton" class="btn btn-primary disabled">+1</button>
-                <button id="decrementButton" class="btn btn-danger disabled">-1</button>
-                <button id="resetButton" class="btn btn-success disabled">Réinitialiser</button>
+                <button id="incrementButton" class="btn btn-primary">+1</button>
+                <button id="decrementButton" class="btn btn-danger">-1</button>
+                <button id="resetButton" class="btn btn-success">Réinitialiser</button>
             </div>
         </div>
+
+        <!-- Tab Navigation -->
         <ul class="nav nav-tabs mb-3" id="myTabs">
             <li class="nav-item" id="tab1">
                 <a class="nav-link active" id="tab1Link" data-bs-toggle="tab" href="#tabContent1">Code Postal Ville</a>
                 <div class="tab-actions">
                     <button class="btn btn-danger btn-sm" onclick="renameTab('tab1Link')">Renommer</button>
-                    <button class="btn btn-danger btn-sm disabled" onclick="clearAllData()">Supprimer</button>
+                    <button class="btn btn-danger btn-sm" onclick="clearAllData()">Supprimer</button>
                 </div>
             </li>
         </ul>
+
+        <!-- Tab Content -->
         <div class="tab-content">
             <div class="tab-pane fade show active" id="tabContent1">
-                <form id="newStreetForm1" class="form-group disabled">
+                <form id="newStreetForm1" class="form-group">
                     <label for="streetSelection1">Sélectionner ou ajouter une nouvelle rue :</label>
                     <select id="streetSelection1" name="streetSelection1" class="form-select">
                         <option value="">Ajouter une nouvelle rue</option>
@@ -304,7 +283,7 @@
                     <input type="text" id="newStreetName1" name="newStreetName1" placeholder="Nom de la nouvelle rue" class="form-control mt-2">
                     <button id="addStreetButton1" type="button" class="btn btn-primary mt-2">Ajouter/Sélectionner Rue</button>
                 </form>
-                <form id="addressForm1" style="display: none;" class="form-group disabled">
+                <form id="addressForm1" style="display: none;" class="form-group">
                     <input type="hidden" id="streetName1" name="streetName1">
                     <label for="number1">Numéro :</label>
                     <input type="text" id="number1" name="number1" required class="form-control"><br>
@@ -321,7 +300,7 @@
                     <textarea id="additionalInfo1" name="additionalInfo1" rows="4" class="form-control"></textarea><br>
                     <button id="addAddressButton1" type="button" class="btn btn-primary mt-2">Ajouter Adresse</button>
                 </form>
-                <form id="filterForm1" class="mt-4 disabled">
+                <form id="filterForm1" class="mt-4">
                     <label for="streetFilter1">Filtrer par Rue :</label>
                     <select id="streetFilter1" name="streetFilter1" class="form-select mb-2">
                         <option value="">Toutes les Rues</option>
@@ -345,16 +324,16 @@
                     <button type="button" id="applyFiltersButton1" class="btn btn-primary mt-2">Appliquer Filtres</button>
                 </form>
                 <div class="d-flex justify-content-between mt-4">
-                    <button id="displayTableButton1" class="btn btn-primary disabled">Afficher Tableau</button>
-                    <button id="exportButton1" class="btn btn-success disabled">Exporter en Excel</button>
-                    <button id="importButton1" class="btn btn-info disabled">Importer</button>
+                    <button id="displayTableButton1" class="btn btn-primary">Afficher Tableau</button>
+                    <button id="exportButton1" class="btn btn-success">Exporter en Excel</button>
+                    <button id="importButton1" class="btn btn-info">Importer</button>
                 </div>
-                <input type="file" id="importFile1" class="form-control mt-2 disabled" accept=".xlsx, .xls" style="display: none;" />
+                <input type="file" id="importFile1" class="form-control mt-2" accept=".xlsx, .xls" style="display: none;" />
                 <div class="table-responsive">
-                    <table id="dataTable1" style="display: none;" class="table table-striped table-bordered mt-4">
+                    <table id="dataTable1" class="table table-striped table-bordered mt-4">
                         <thead>
                             <tr>
-                                <th onclick="sortTable()">Nom de la Rue</th>
+                                <th>Nom de la Rue</th>
                                 <th>Numéro</th>
                                 <th>Statut</th>
                                 <th>Informations Additionnelles</th>
@@ -440,6 +419,7 @@
                     streetSelect.appendChild(option);
                     streetSelect.value = newStreetName;
                     document.getElementById("newStreetName1").value = '';
+                    showAlert('Rue ajoutée avec succès !', false); // Show success alert
                 }
             }
             document.getElementById("streetName1").value = streetSelect.value;
@@ -468,6 +448,7 @@
                     displayDataTable();
                     updateChart();
                     updateMapMarkers(); // Mettre à jour les marqueurs de la carte
+                    showAlert('Adresse ajoutée avec succès !', false); // Show success alert
                 } else {
                     alert("Cette adresse existe déjà pour cette rue.");
                 }
@@ -825,4 +806,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
